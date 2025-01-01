@@ -13,14 +13,16 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon/favicon-16x16.png">
     <link rel="manifest" href="/static/favicon/site.webmanifest">
   </head>
-  <body class="d-flex align-items-center justify-content-center vh-100" style="margin: 0;">
+  <body class="d-flex align-items-center bg-body-primary" style="margin: 0;">
     <div class="container">
       <div class="row justify-content-center">
-        <div class="col-12 col-md-6 col-lg-4 text-center">
+        <div class="col-12 col-lg-6 text-center mt-5">
           <a href="/">
-            <img src="{{ url_for('static', filename='logo.png') }}" height="150px" width="150px" class="rounded">
+            <img src="{{ url_for('static', filename='logo.png') }}" width="150px" class="rounded my-4">
           </a>
-          <form action='login' method='POST'>
+          <h1 class="text-light">Log in to your DansHQ account</h1>
+          {{ error }}
+          <form action='login' method='POST' class="bg-light mt-4 p-5 rounded">
             <div class="mb-3 text-start">
               <label for="exampleInputEmail1" class="form-label">Email address</label>
               <input type="email" class="form-control" id="exampleInputEmail1" name='email' required>
@@ -29,10 +31,9 @@
               <label for="password" class="form-label">Password</label>
               <input type="password" class="form-control" id="password" name='password' required>
             </div>
-            <button type="submit" class="btn btn-primary w-100 mb-3">Submit</button>
+            <button type="submit" class="btn btn-primary w-100 mb-3">Log in</button>
+            <p class="text-start mb-0"><a href="{{ url_for('register') }}" class="text-start">Forgot your password?</a></p>
           </form>
-          <p class="text-start">Don't have an account? <a href="{{ url_for('register') }}">Join now</a></p>
-          {{ error }}
         </div>  
       </div>
     </div>

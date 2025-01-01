@@ -6,11 +6,14 @@ import os
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from scripts import send_welcome_email
-from flask_mail import Mail
+from datetime import datetime
+
 
 app = Flask(__name__)
 app.config.from_object(config)
-mail = Mail(app)
+
+app.secret_key = app.config.get('SECRET_KEY')
+
 
 if os.getenv('FLASK_ENV') == 'development':
     app.config['DEBUG'] = True
@@ -20,9 +23,10 @@ class User(flask_login.UserMixin):
         self.id = user_data[0]            # id
         self.email = user_data[1]         # email
         self.password = user_data[2]      # password
-        self.first_name = user_data[3]    # first_name
-        self.last_name = user_data[4]     # last_name
-        self.user_role = user_data[6]     # user_role
+        self.name = user_data[3]          # name
+        self.phone = user_data[4]         # last_name
+        self.date_start = user_data[5]    # date_start
+        self.date_leave = user_data[6]    # date_leave
 
 login_manager = flask_login.LoginManager()
 login_manager.init_app(app)
@@ -54,27 +58,28 @@ def user_loader(user_id):
     return User(user_data[0])
 
 @app.route('/')
+@flask_login.login_required
 def index():
     return render_template('index.html', user=flask_login.current_user)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'GET':
-        return render_template('register.html')
+        return render_template('admin.html')
 
     sql = """
-    INSERT INTO users (`email`, `password`, `first_name`, `last_name`)
-    VALUES (%s, %s, %s, %s)
+    INSERT INTO users (`email`, `password`, `name`, `phone`, `date_start`)
+    VALUES (%s, %s, %s, %s, %s)
     """
     values = (
         request.form['email'],
         generate_password_hash(request.form['password']),
-        request.form['first_name'],
-        request.form['last_name'],
+        request.form['name'],
+        request.form['phone'],
+        datetime.strptime(request.form['date_start'], '%m/%d/%Y').strftime('%Y-%m-%d')
     )
 
     db_update(app, sql, values)
-    send_welcome_email(app, mail, request.form['email'], request.form['first_name'])
     return redirect(url_for('login'))
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -89,6 +94,7 @@ def login():
     if user_data and check_password_hash(user_data[0][2], password):
         user = User(user_data[0])
         flask_login.login_user(user)
+        flash("User logged in successfully!")
         return redirect(url_for('index'))
 
     error = "Invalid email or password."
