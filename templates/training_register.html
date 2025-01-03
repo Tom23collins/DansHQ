@@ -7,6 +7,64 @@
 
 {% include "nav.html" %}
 
-This is the training register
+<h3 class="text-center">Training Log</h3>
+
+<div class="d-flex gap-3 mt-5">
+
+    
+    <div class="col-12 bg-white p-3 rounded border">
+        <table class="table">
+
+            <thead>
+              <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Training</th>
+                <th scope="col">Date attended</th>
+                <th scope="col">Date expires</th>
+                <th scope="col">Passed</th>
+              </tr>
+            </thead>
+
+            <tbody>
+                {% if training_log %}
+                {% for row in training_log %}
+
+                <tr>
+                    {% if users %}
+                        {% for user in users %}
+                        <td>{{ user[3] if row[1] == user[0] else 'Provider not found' }}</td>
+                        {% endfor %}
+                    {% else %}
+                        <td>No data available</td>
+                    {% endif %}
+
+
+                    {% if training_courses %}
+                        {% for course in training_courses %}
+                        <td>{{ course[1] if row[2] == course[0] else 'Provider not found' }}</td>
+                        {% endfor %}
+                    {% else %}
+                        <td>No data available</td>
+                    {% endif %}
+
+                    <td>{{ row[4] }}</td>
+                    <td>{{ row[5] }}</td>
+                    <td>{{ 'True' if row[6] == 1 else 'False' }}</td>
+                </tr>
+                {% endfor %}
+            {% else %}
+            <tr>
+                <td colspan="6">No course data available</td>
+            </tr>
+            {% endif %}
+            </tbody>
+
+          </table>
+
+    </div>
+
+
+
+</div>
 
 {% endblock %}

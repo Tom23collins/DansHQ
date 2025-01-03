@@ -68,34 +68,34 @@ def index():
 @app.route('/training_register')
 @flask_login.login_required
 def training_register():
-    return render_template('training_register.html', user=flask_login.current_user)
+    return render_template('training_register.html', 
+                           user=flask_login.current_user,
+                           training_log = db_query(app, 'SELECT * FROM training_log'),
+                           users = db_query(app, 'SELECT * FROM users'),
+                           training_courses = db_query(app, 'SELECT * FROM training_courses'))
 
-@app.route('/roles')
+@app.route('/roles', methods=['GET', 'POST'])
 @flask_login.login_required
 def roles():
 
     if request.method == 'GET':
         return render_template('roles.html', 
                                user=flask_login.current_user, 
-                               course_register = db_query(app, 'SELECT * FROM training_courses'))
+                               roles = db_query(app, 'SELECT * FROM roles'))
     
-    is_mandatory = 1 if request.form['is_mandatory'] == 'on' else 0
 
     sql = """
-    INSERT INTO training_courses (`name`, `description`, `duration`, `is_mandatory`, `course_provider_id`)
-    VALUES (%s, %s, %s, %s, %s)
+    INSERT INTO roles (`role_name`, `role_description`)
+    VALUES (%s, %s)
     """
     values = (
         request.form['name'],
         request.form['description'],
-        request.form['duration'],
-        is_mandatory,
-        request.form['course_provider_id'],
     )
 
     db_update(app, sql, values)
-    return redirect(url_for('course_register'))
-    return render_template('roles.html', user=flask_login.current_user)
+
+    return redirect(url_for('roles'))
 
 @app.route('/course_register', methods=['GET', 'POST'])
 @flask_login.login_required
@@ -124,7 +124,7 @@ def course_register():
     db_update(app, sql, values)
     return redirect(url_for('course_register'))
 
-@app.route('/course_providers', methods=['GET', 'POST'])
+@app.route('/course-providers', methods=['GET', 'POST'])
 @flask_login.login_required
 def course_providers():
     course_providers = db_query(app, 'SELECT * FROM course_providers')
@@ -164,30 +164,61 @@ def settings():
         generate_password_hash(request.form['password']),
         request.form['name'],
         request.form['phone'],
-        datetime.strptime(request.form['date_start'], '%m/%d/%Y').strftime('%Y-%m-%d'),
+        datetime.strptime(request.form['date_start'], '%d/%m/%Y').strftime('%Y-%m-%d'),
     )
 
     db_update(app, sql, values)
 
-    user_id = db_query_values(app, 'SELECT id FROM users WHERE email = %s', (request.form['email'],))
-
-    # Assign user roles
-
-    # sql = """
-    # INSERT INTO user_roles (`user_id`, `role_id`)
-    # VALUES (%s, %s)
-    # """
-
-    # role_id = "2"
-
-    # values = (
-    #     user_id, 
-    #     role_id,
-    # )
-
-    # db_update(app, sql, values)
-
     return redirect(url_for('settings'))
+
+@app.route('/user-settings', methods=['GET', 'POST'])
+@flask_login.login_required
+def user_settings():
+    user_id = None
+
+    if request.method == 'POST':
+        date_start = (
+        datetime.strptime(request.form.get('date_start'), '%Y-%m-%d').strftime('%Y-%m-%d') if request.form.get('date_start') else None
+        )
+        date_leave = (
+            datetime.strptime(request.form.get('date_leave'), '%Y-%m-%d').strftime('%Y-%m-%d') if request.form.get('date_leave') else None
+        )
+
+        sql = """
+        UPDATE users
+        SET email = %s, name = %s, phone = %s, date_start = %s, date_leave = %s
+        WHERE id = %s
+        """
+        values = (
+            request.form.get('email'),
+            request.form.get('name'),
+            request.form.get('phone'),
+            date_start,
+            date_leave,
+            request.form['user_id'],
+        )
+
+        db_update(app, sql, values)
+
+        return redirect(url_for('settings'))
+    
+    if request.method == 'GET':
+        user_id = request.args.get('user_id')
+        user_info = db_query_values(app, 'SELECT * FROM users WHERE id = %s', (user_id,))
+        user_roles = db_query_values(app, 'SELECT * FROM user_roles WHERE user_id = %s', (user_id,))
+
+        return render_template(
+            'user_settings.html',
+            user=flask_login.current_user,
+            user_id=user_id,
+            user_info=user_info,
+            roles=db_query(app, 'SELECT * FROM roles'),
+            user_roles = user_roles
+        )
+
+    return redirect(url_for('user_settings'))
+
+
 
 
 @app.route('/login', methods=['GET', 'POST'])

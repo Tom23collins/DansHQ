@@ -13,7 +13,7 @@
 
         <h3>Create a role</h3>
         
-        <form action='course_register' method='POST'>
+        <form action='roles' method='POST'>
             <div class="mb-3">
                 <label for="name" class="form-label">Name</label>
                 <input type="text" class="form-control" id="name" name='name' required>
@@ -21,18 +21,6 @@
             <div class="mb-3">
                 <label for="description" class="form-label">Description</label>
                 <input type="text" class="form-control" id="description" name='description' required>
-            </div>
-            <div class="mb-3">
-                <label for="options" class="form-label">Required courses (Ctrl click for multiple)</label>
-                <select class="form-control" id="options" name='options[]' multiple required>
-                    {% if course_register %}
-                        {% for row in course_register %}
-                        <option value="{{ row[0] }}">{{ row[1] }}</option>
-                        {% endfor %}
-                    {% else %}
-                        <option value="">No course data available</option>
-                    {% endif %}
-                </select>
             </div>
             <button type="submit" class="btn btn-primary w-100 mb-3">Submit</button>
         </form>
@@ -48,27 +36,15 @@
               <tr>
                 <th scope="col">Name</th>
                 <th scope="col">Description</th>
-                <th scope="col">Duration</th>
-                <th scope="col">Mandatory</th>
-                <th scope="col">Course provider</th>
               </tr>
             </thead>
 
             <tbody>
-                {% if course_register %}
-                {% for row in course_register %}
+                {% if roles %}
+                {% for row in roles %}
                 <tr>
                     <td>{{ row[1] }}</td>
                     <td>{{ row[2] }}</td>
-                    <td>{{ row[3] }}</td>
-                    <td>{{ 'True' if row[4] == 1 else 'False' }}</td>
-                    {% if course_providers %}
-                        {% for provider in course_providers %}
-                        <td>{{ provider[1] if row[5] == provider[0] else 'Provider not found' }}</td>
-                        {% endfor %}
-                    {% else %}
-                        <td>No data available</td>
-                    {% endif %}
                 </tr>
                 {% endfor %}
             {% else %}
