@@ -31,6 +31,9 @@ class User(flask_login.UserMixin):
 login_manager = flask_login.LoginManager()
 login_manager.init_app(app)
 
+from werkzeug.middleware.proxy_fix import ProxyFix
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+
 def role_required(role):
     def decorator(f):
         @wraps(f)
