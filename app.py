@@ -164,7 +164,7 @@ def settings():
         generate_password_hash(request.form['password']),
         request.form['name'],
         request.form['phone'],
-        datetime.strptime(request.form['date_start'], '%d/%m/%Y').strftime('%Y-%m-%d'),
+        datetime.strptime(request.form['date_start'], '%Y-%m-%d').strftime('%Y-%m-%d'),
     )
 
     db_update(app, sql, values)
