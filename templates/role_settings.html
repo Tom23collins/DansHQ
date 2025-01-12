@@ -1,0 +1,71 @@
+<!-- templates/settings.html -->
+{% extends "base.html" %}
+
+{% block title %}Settings · DansHQ{% endblock %}
+
+{% block pagetitle %}
+<span class="border-start px-3">roles</span>
+<span class="border-start ps-3">role details</span>
+{% endblock %}
+
+{% block content %}
+
+{% include "nav.html" %}
+
+<div class="d-flex gap-3 mt-5">
+
+   <div class="col-12 bg-white p-3 rounded border">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid p-0">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <h3>Role details</h3>
+                <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                    <div class="navbar-nav ms-auto">
+                        <a class="nav-link active" href="{{ url_for('roles') }}"><i class="bi bi-arrow-left"></i> back to roles</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        {% if role_info %}
+            {% for row in role_info %}
+            <form action="{{ url_for('role_settings') }}" method='POST'>
+                <div class="mb-3 text-start">
+                    <label for="name" class="form-label">Name</label>
+                    <input type="text" class="form-control" id="name" name="name" value="{{ row[1] }}">
+                </div>
+                <div class="mb-3 text-start">
+                    <label for="description" class="form-label">Description</label>
+                    <input type="text" class="form-control" id="description" name="description" value="{{ row[2] }}">
+                </div>
+                <p>Courses required</p>
+                {% for course in courses %}
+                <div class="mb-3">
+                    <input 
+                        type="checkbox" 
+                        class="form-check-input" 
+                        id="is_mandatory_{{ course[0] }}" 
+                        name="is_mandatory_{{ course[0] }}" 
+                        {% if course[0] in role_requirements | map(attribute=2) %} checked {% endif %}>
+                    <label 
+                        class="form-check-label" 
+                        for="is_mandatory_{{ course[0] }}">{{ course[1] }}</label>
+                </div>
+                {% endfor %}
+                <input type="hidden" id="role_id" name="role_id" value="{{ role_id }}">
+                <button type="submit" class="btn btn-primary w-100 mb-3">Apply changes</button>
+            </form>
+            {% endfor %}
+        {% else %}
+        <tr>
+            <td colspan="6">No role data available</td>
+        </tr>
+        {% endif %}
+
+   </div>
+
+
+
+</div>
+{% endblock %}

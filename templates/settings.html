@@ -17,7 +17,7 @@
 
         <h3>Create a new user</h3>
         
-        <form action='settings' method='POST'>
+        <form action='settings' method='POST' autocomplete="new-password">
             <div class="mb-3 text-start">
               <label for="name" class="form-label">Name*</label>
               <input type="text" class="form-control" id="name" name='name' required>
@@ -67,17 +67,17 @@
                 {% if users %}
                 {% for row in users %}
                 <tr>
-                  <td>
+                    <td>
+                      
+                      <form action="{{ url_for('user_settings') }}" method="GET">
+                        <input type="hidden" id="user_id" name="user_id" value="{{ row[0] }}">
+                        <button type="submit" value="Upload" class="btn p-0 m-0">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+                      </form>
                     
-                    <form action="{{ url_for('user_settings') }}" method="GET">
-                      <input type="hidden" id="user_id" name="user_id" value="{{ row[0] }}">
-                      <button type="submit" value="Upload" class="btn p-0 m-0">
-                          <i class="bi bi-pencil-square"></i>
-                      </button>
-                    </form>
-                  
-                  
-                  </td>
+                    
+                    </td>
                     <td>{{ row[3] }}</td>
                     <td>{{ row[1] }}</td>
                     <td>{{ row[4] }}</td>
@@ -99,4 +99,5 @@
 
 
 </div>
+
 {% endblock %}

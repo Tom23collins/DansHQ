@@ -11,13 +11,60 @@
 
 <div class="d-flex gap-3 mt-5">
 
+    <div class="col-4 bg-white p-3 rounded border">
+
+        <h3>Record training</h3>
+        
+        <form action='training_register' method='POST'>
+            <div class="mb-3">
+                <label for="user_id" class="form-label">User</label>
+                <select id="user_id" name="user_id" class="form-control" required>
+                    <option value="" disabled selected>Select a trainee</option>
+                    {% if users %}
+                        {% for row in users %}
+                        <option value="{{ row[0] }}">{{ row[3] }}</option>
+                        {% endfor %}
+                    {% else %}
+                    <option value="">No course provider data available</option>
+                    {% endif %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="training_id" class="form-label">Training course</label>
+                <select id="training_id" name="training_id" class="form-control" required>
+                    <option value="" disabled selected>Select a training course</option>
+                    {% if training_courses %}
+                        {% for row in training_courses %}
+                        <option value="{{ row[0] }}">{{ row[1] }}</option>
+                        {% endfor %}
+                    {% else %}
+                    <option value="">No course data available</option>
+                    {% endif %}
+                </select>
+            </div>
+            <div class="mb-3 text-start">
+                <label for="date_attended" class="form-label">Date attended</label>
+                <input type="date" class="form-control" id="date_attended" name="date_attended" required>
+            </div>
+            <div class="mb-3 text-start">
+                <label for="date_expires" class="form-label">Date expires</label>
+                <input type="date" class="form-control" id="date_expires" name="date_expires" required>
+            </div>
+            <div class="mb-3">
+                <input type="checkbox" class="form-check-input" id="passed" name="passed">
+                <label class="form-check-label" for="passed">Course passed</label>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 mb-3">Submit</button>
+        </form>
+          
+    </div>
     
-    <div class="col-12 bg-white p-3 rounded border">
+    <div class="col-8 bg-white p-3 rounded border">
         <table class="table">
 
             <thead>
               <tr>
-                <th scope="col">Name</th>
+                <th scope="col">User</th>
                 <th scope="col">Training</th>
                 <th scope="col">Date attended</th>
                 <th scope="col">Date expires</th>
@@ -32,7 +79,16 @@
                 <tr>
                     {% if users %}
                         {% for user in users %}
-                        <td>{{ user[3] if row[1] == user[0] else 'Provider not found' }}</td>
+                            {% if row[1] == user[0] %}
+                                <td>
+                                    <form action="{{ url_for('user_settings') }}" method="GET">
+                                        <input type="hidden" id="user_id" name="user_id" value="{{ user[0] }}">
+                                        <button type="submit" value="Upload" class="btn p-0 m-0">
+                                            {{ user[3] }}
+                                        </button>
+                                    </form>
+                                </td>
+                            {% endif %}
                         {% endfor %}
                     {% else %}
                         <td>No data available</td>
@@ -41,7 +97,9 @@
 
                     {% if training_courses %}
                         {% for course in training_courses %}
-                        <td>{{ course[1] if row[2] == course[0] else 'Provider not found' }}</td>
+                            {% if row[2] == course[0] %}
+                                <td>{{ course[1] }}</td>
+                            {% endif %}
                         {% endfor %}
                     {% else %}
                         <td>No data available</td>

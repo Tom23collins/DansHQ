@@ -4,14 +4,27 @@
 {% block title %}Settings · DansHQ{% endblock %}
 
 {% block pagetitle %}
-<span class="border-start ps-3">settings pannel</span>
+<span class="border-start px-3">settings pannel</span>
+<span class="border-start ps-3">user details</span>
 {% endblock %}
 
 {% block content %}
 <div class="d-flex gap-3 mt-5">
 
    <div class="col-12 bg-white p-3 rounded border">
-        <h3>User details</h3>
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid p-0">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <h3>User details</h3>
+                <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                    <div class="navbar-nav ms-auto">
+                        <a class="nav-link active" href="{{ url_for('settings') }}"><i class="bi bi-arrow-left"></i> back to settings</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
         {% if user_info %}
             {% for row in user_info %}
             <form action="{{ url_for('user_settings') }}" method='POST'>
@@ -43,7 +56,7 @@
                         class="form-check-input" 
                         id="is_mandatory_{{ row[0] }}" 
                         name="is_mandatory_{{ row[0] }}" 
-                        {% if row[0] in user_roles|map(attribute=2) %} checked {% endif %}>
+                        {% if row[0] in user_roles | map(attribute=2) %} checked {% endif %}>
                     <label 
                         class="form-check-label" 
                         for="is_mandatory_{{ row[0] }}">{{ row[1] }}</label>
