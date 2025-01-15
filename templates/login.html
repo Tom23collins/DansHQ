@@ -21,7 +21,6 @@
             <img src="{{ url_for('static', filename='logo.png') }}" width="150px" class="rounded my-4">
           </a>
           <h1 class="text-light">Log in to your DansHQ account</h1>
-          {{ error }}
           <form action='login' method='POST' class="bg-light mt-4 p-5 rounded">
             <div class="mb-3 text-start">
               <label for="exampleInputEmail1" class="form-label">Email address</label>
@@ -32,6 +31,7 @@
               <input type="password" class="form-control" id="password" name='password' required>
             </div>
             <button type="submit" class="btn btn-primary w-100 mb-3">Log in</button>
+            <p class="text-danger">{{ error }}</p>
           </form>
         </div>  
       </div>

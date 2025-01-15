@@ -328,6 +328,49 @@ def user_settings():
         user_id = request.args.get('user_id')
         user_info = db_query_values(app, 'SELECT * FROM users WHERE id = %s', (user_id,))
         user_roles = db_query_values(app, 'SELECT * FROM user_roles WHERE user_id = %s', (user_id,))
+        user_training = db_query_values(app, 'SELECT * FROM training_log WHERE user_id = %s', (user_id,))
+
+        current_role = request.args.get('current_role')
+
+        if current_role == None:
+            current_role = user_roles[0][2]
+
+        user_role_requirements = db_query_values(app, 'SELECT * FROM role_requirements WHERE role_id = %s', (current_role,))
+
+        result_data = []
+
+        unique_role_ids = set(role[1] for role in user_role_requirements)
+
+        if not unique_role_ids:
+            result_data.append({
+                "role_id": current_role,
+                "required_courses": None,
+                "passed_courses": None,
+                "failed_courses": None,
+                "is_qualified": True
+            })
+        else:
+            for role_id in unique_role_ids:
+                required_courses = [r[2] for r in user_role_requirements if r[1] == role_id]
+                passed_courses = []
+                failed_courses = []
+
+                for required_course in required_courses:
+                    if any(log[2] == required_course and log[6] for log in user_training):
+                        passed_courses.append(required_course)
+                    else:
+                        failed_courses.append(required_course)
+
+                is_qualified = len(failed_courses) == 0
+
+                result_data.append({
+                    "role_id": role_id,
+                    "required_courses": required_courses,
+                    "passed_courses": passed_courses,
+                    "failed_courses": failed_courses,
+                    "is_qualified": is_qualified
+                })
+
 
         return render_template(
             'user_settings.html',
@@ -335,7 +378,9 @@ def user_settings():
             user_id=user_id,
             user_info=user_info,
             roles=db_query(app, 'SELECT * FROM roles'),
-            user_roles = user_roles
+            user_roles = user_roles,
+            user_training=user_training,
+            result_data=result_data
         )
 
     return redirect(url_for('user_settings', user_id=user_id))
