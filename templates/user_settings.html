@@ -4,8 +4,7 @@
 {% block title %}Settings · DansHQ{% endblock %}
 
 {% block pagetitle %}
-<span class="border-start px-3">settings pannel</span>
-<span class="border-start ps-3">user details</span>
+    {{ user_info[0][3] }}
 {% endblock %}
 
 {% block content %}
@@ -90,15 +89,49 @@
         </nav>
         <div class="row bg-white p-3 rounded border">
             {% for role in result_data %}
-            <h2>Role ID: {{ role.role_id }}</h2>
-            {% if role.required_courses %}
-                <p>Required Courses: {{ role.required_courses | join(', ') }}</p>
-                <p>Passed Courses: {{ role.passed_courses | join(', ') }}</p>
-                <p>Failed Courses: {{ role.failed_courses | join(', ') }}</p>
-            {% else %}
-                <p>No required courses for this role.</p>
-            {% endif %}
-            <p>Status: {{ 'Qualified' if role.is_qualified else 'Not Qualified' }}</p>
+                {% if role.is_qualified %}
+                    <h5>You have the required training for the {{ current_role[0][1] }} role</h5>
+                {% else %}
+                    <h5>You don't have the required training for the {{ current_role[0][1] }} role</h5>
+                {% endif %}
+                {% if role.required_courses %}
+                    <table class="table">
+
+                        <thead>
+                        <tr>
+                            <th scope="col"></th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Description</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for row in role.failed_courses %}
+                            <tr>
+                                <td><i class="bi bi-circle-fill text-danger"></i></td>
+                                <td>
+                                    {{ row[0][1] }}
+                                </td>
+                                <td>
+                                    {{ row[0][2] }}
+                                </td>
+                            <tr>
+                            {% endfor %}
+                            {% for row in role.passed_courses %}
+                            <tr>
+                                <td><i class="bi bi-circle-fill text-success"></i></td>
+                                <td>
+                                    {{ row[0][1] }}
+                                </td>
+                                <td>
+                                    {{ row[0][2] }}
+                                </td>
+                            <tr>
+                            {% endfor %}
+                        </tbody>
+                {% else %}
+                    <p>No required courses for this role.</p>
+                {% endif %}
             {% endfor %}
 
         </div>

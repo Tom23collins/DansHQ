@@ -334,7 +334,7 @@ def user_settings():
 
         if current_role == None:
             current_role = user_roles[0][2]
-
+            
         user_role_requirements = db_query_values(app, 'SELECT * FROM role_requirements WHERE role_id = %s', (current_role,))
 
         result_data = []
@@ -356,11 +356,13 @@ def user_settings():
                 failed_courses = []
 
                 for required_course in required_courses:
+                    course_info = db_query_values(app, 'SELECT * FROM training_courses WHERE id = %s', (required_course,))
                     if any(log[2] == required_course and log[6] for log in user_training):
-                        passed_courses.append(required_course)
+                        passed_courses.append(course_info)
                     else:
-                        failed_courses.append(required_course)
+                        failed_courses.append(course_info)
 
+                print(passed_courses)
                 is_qualified = len(failed_courses) == 0
 
                 result_data.append({
@@ -371,13 +373,16 @@ def user_settings():
                     "is_qualified": is_qualified
                 })
 
+        roles = db_query(app, 'SELECT * FROM roles')
+        role_info = db_query_values(app, 'SELECT * FROM roles WHERE role_id = %s', (current_role,))
 
         return render_template(
             'user_settings.html',
             user=flask_login.current_user,
             user_id=user_id,
             user_info=user_info,
-            roles=db_query(app, 'SELECT * FROM roles'),
+            roles=roles,
+            current_role=role_info,
             user_roles = user_roles,
             user_training=user_training,
             result_data=result_data
