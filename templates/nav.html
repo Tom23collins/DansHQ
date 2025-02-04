@@ -1,15 +1,30 @@
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
-    <div class="container-fluid">
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link active" href="{{  url_for('training_register') }}">Personnel</a>
-                <a class="nav-link active" href="{{  url_for('roles') }}">Roles</a>
-                <a class="nav-link active" href="{{  url_for('course_register') }}">Course register</a>
-                <!-- <a class="nav-link active" href="{{  url_for('course_providers') }}">Providers</a> -->
-            </div>
-        </div>
+
+<nav class="navbar navbar-expand-lg bg-body-primary text-light" data-bs-theme="dark">
+    <div class="container">
+      <a class="navbar-brand text-light d-flex align-items-center" href="/">
+        <img src="{{ url_for('static', filename='logo.png') }}" class="bi me-3" height="50px">
+        <span class="px-3">DansHQ</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav">
+          {% if user.user_role != 'user' %}
+          <li class="nav-item">
+            <a class="nav-link text-light" href="{{  url_for('training_register') }}">Training register</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-light" href="{{  url_for('course_register') }}">Training courses</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-light" href="{{  url_for('roles') }}">Roles</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-light" href="{{  url_for('settings') }}">Users pannel</a>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
     </div>
 </nav>

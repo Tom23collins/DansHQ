@@ -1,3 +1,7 @@
 .bg-body-primary {
     background-color: #152F62;
 }
+
+.nav-link:hover {
+    text-decoration: underline;
+}

@@ -1,0 +1,72 @@
+<!-- templates/settings.html -->
+{% extends "base.html" %}
+
+{% block title %}Settings · DansHQ{% endblock %}
+
+{% block content %}
+
+<div class="d-flex gap-3 mt-5">
+
+    <div class="col-4 bg-white p-3 rounded border">
+
+        <h3>Edit user permissions</h3>
+        
+        <form action='admin-settings' method='POST'>
+
+            <div class="mb-3">
+                <label for="userSelect" class="form-label">User</label>
+                <select id="userSelect" name="user_id" class="form-select" required>
+                    <option value="" disabled selected hidden>Select a user</option>
+                    {% for row in users %}
+                    <option value="{{ row[0] }}">{{ row[3] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="roleSelect" class="form-label">Select Role</label>
+                <select id="roleSelect" name="role" class="form-select">
+                    <option value="user">User</option>
+                    <option value="office_staff">Office staff</option>
+                    <option value="administrator">Administrator</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 mb-3">Submit</button>
+
+        </form>
+          
+    </div>
+
+    <div class="col-8 bg-white p-3 rounded border">
+        <table class="table">
+
+            <thead>
+              <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Role</th>
+              </tr>
+            </thead>
+
+            <tbody>
+                {% if users %}
+                {% for row in users %}
+                <tr>
+                    <td>{{ row[3] }}</td>
+                    <td>{{ row[7] }}</td>
+                </tr>
+                {% endfor %}
+            {% else %}
+            <tr>
+                <td colspan="6">No user data available</td>
+            </tr>
+            {% endif %}
+            </tbody>
+
+          </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

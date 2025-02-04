@@ -1,11 +1,7 @@
 <!-- templates/settings.html -->
 {% extends "base.html" %}
 
-{% block title %}Settings · DansHQ{% endblock %}
-
-{% block pagetitle %}
-    {{ user_info[0][3] }}
-{% endblock %}
+{% block title %}{{ user_info[0][3] }} · DansHQ{% endblock %}
 
 {% block content %}
 <div class="d-flex gap-3 mt-5">
