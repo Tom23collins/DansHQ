@@ -12,7 +12,6 @@ from datetime import datetime
 #       Data handling algorithms should be moved to the scripts folder out of views
 #       See who can do the role inside of roles
 #       See who has completed training
-#       Traffic light system for training data
 #       Filters on tables
 #       delete roles
 
@@ -167,13 +166,15 @@ def user_settings():
         user_info = db_query_values(app, 'SELECT * FROM users WHERE id = %s', (user_id,))
         user_training = db_query_values(app, 'SELECT * FROM training_log WHERE user_id = %s', (user_id,))
         user_roles = db_query_values(app, 'SELECT role_id FROM user_roles WHERE user_id = %s', (user_id,))
+        all_roles = db_query(app, 'SELECT * FROM roles')
 
         return render_template(
-            'user_settings.html',
+            'user_settings.html',   
             user=flask_login.current_user,
             user_id=user_id,
-            user_info=user_info,
+            user_info = user_info,
             user_roles = user_roles,
+            roles = all_roles,
             user_training=user_training,
             result_data=get_role_data_for_user(app, user_id)
         )

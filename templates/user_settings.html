@@ -34,17 +34,17 @@
                     </div>
                     <p>User roles</p>
                     {% for row in roles %}
-                    <div class="mb-3">
-                        <input 
-                            type="checkbox" 
-                            class="form-check-input" 
-                            id="is_mandatory_{{ row[0] }}" 
-                            name="is_mandatory_{{ row[0] }}" 
-                            {% if row[0] in user_roles | map(attribute=2) %} checked {% endif %}>
-                        <label 
-                            class="form-check-label" 
-                            for="is_mandatory_{{ row[0] }}">{{ row[1] }}</label>
-                    </div>
+                        <div class="mb-3">
+                            <input 
+                                type="checkbox" 
+                                class="form-check-input" 
+                                id="is_mandatory_{{ row[0] }}" 
+                                name="is_mandatory_{{ row[0] }}" 
+                                {% if row[0] in user_roles | map(attribute=0) %} checked {% endif %}>
+                            <label 
+                                class="form-check-label" 
+                                for="is_mandatory_{{ row[0] }}">{{ row[1] }}</label>
+                        </div>
                     {% endfor %}
                     <input type="hidden" id="user_id" name="user_id" value="{{ user_id }}">
                     {% if user.user_role != 'user' %}
