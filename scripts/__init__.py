@@ -1,5 +1,5 @@
 # __init__.py
 
-from .send_email import send_welcome_email
+from .get_role_data_for_user import get_role_data_for_user
 
-__all__ = ['send_welcome_email']
+__all__ = ['get_role_data_for_user']

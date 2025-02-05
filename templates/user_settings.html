@@ -7,13 +7,10 @@
 <div class="d-flex gap-3 mt-5">
 
    <div class="col-4 px-3">
-        <div class="row bg-white p-3 rounded border text-center mb-3">
-            <h5>{{ user_info[0][3] }}</h5>
-        </div>
         <div class="row bg-white p-3 rounded border">
             {% if user_info %}
                 {% for row in user_info %}
-                <h5>Details</h5>
+                <h5>{{ user_info[0][3] }}</h5>
                 <form action="{{ url_for('user_settings') }}" method='POST'>
                     <div class="mb-3 text-start">
                         <label for="email" class="form-label">Email</label>
@@ -64,71 +61,46 @@
    </div>
 
    <div class="col-8 px-3">
-        <nav class="navbar navbar-expand-lg bg-body-tertiary">
-            <div class="container-fluid">
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-                    <div class="navbar-nav ms-auto">
-                        {% for row in roles %}
-                            {% if row[0] in user_roles | map(attribute=2) %} 
-                                <a class="nav-link active" href="{{ url_for('user_settings', user_id=user_id, current_role = row[0]) }}">{{ row[1] }} </a>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-        </nav>
-        <div class="row bg-white p-3 rounded border">
-            {% for role in result_data %}
-                {% if role.is_qualified %}
-                    <h5>You have the required training for the {{ current_role[0][1] }} role</h5>
-                {% else %}
-                    <h5>You don't have the required training for the {{ current_role[0][1] }} role</h5>
-                {% endif %}
-                {% if role.required_courses %}
-                    <table class="table">
 
-                        <thead>
+        {% for role in result_data %}
+        <div class="row bg-white p-3 rounded border mb-4">
+
+            <h5><i class="bi bi-circle-fill {{ 'text-success' if role['qualified'] else 'text-danger' }}"></i> {{ role['role_name'] }}</h5>
+            
+            {% if role['course_info'] %}
+            <table class="table">
+
+                <thead>
+                  <tr>
+                    <th scope="col">Qualified</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Date attended</th>
+                    <th scope="col">Date expires</th>
+                    <th scope="col">Passed</th>
+                  </tr>
+                </thead>
+    
+                <tbody>
+                    {% for course in role['course_info'] %}
                         <tr>
-                            <th scope="col"></th>
-                            <th scope="col">Name</th>
-                            <th scope="col">Description</th>
+                            <td><i class="bi bi-circle-fill {{ 'text-success' if course['passed_course'] else 'text-danger' }}"></i></td>
+                            <td>{{ course['course_name'] }}</td>
+                            <td>{{ course['course_desc'] }}</td>
+                            <td>{{ course['date_attended'] }}</td>
+                            <td>{{ course['date_expires'] }}</td>
+                            <td>{{ 'True' if course['passed'] else 'False' }}</td>
                         </tr>
-                        </thead>
-
-                        <tbody>
-                            {% for row in role.failed_courses %}
-                            <tr>
-                                <td><i class="bi bi-circle-fill text-danger"></i></td>
-                                <td>
-                                    {{ row[0][1] }}
-                                </td>
-                                <td>
-                                    {{ row[0][2] }}
-                                </td>
-                            <tr>
-                            {% endfor %}
-                            {% for row in role.passed_courses %}
-                            <tr>
-                                <td><i class="bi bi-circle-fill text-success"></i></td>
-                                <td>
-                                    {{ row[0][1] }}
-                                </td>
-                                <td>
-                                    {{ row[0][2] }}
-                                </td>
-                            <tr>
-                            {% endfor %}
-                        </tbody>
-                {% else %}
-                    <p>No required courses for this role.</p>
-                {% endif %}
-            {% endfor %}
+                    {% endfor %}
+                </tbody>
+                
+            </table>
+            {% else %}
+                <p>No required courses for this role, add some!</p>
+            {% endif %}
 
         </div>
-
+        {% endfor %}
 
    </div>
 
