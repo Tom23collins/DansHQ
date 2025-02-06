@@ -60,6 +60,8 @@
 
             <thead>
               <tr>
+                <th scope="col"></th>
+                <th scope="col">Role</th>
                 <th scope="col">User</th>
                 <th scope="col">Training</th>
                 <th scope="col">Date attended</th>
@@ -69,42 +71,21 @@
             </thead>
 
             <tbody>
-                {% if training_log %}
-                {% for row in training_log %}
-
-                <tr>
-                    {% if users %}
-                        {% for user in users %}
-                            {% if row[1] == user[0] %}
-                                <td>
-                                    <form action="{{ url_for('user_settings') }}" method="GET">
-                                        <input type="hidden" id="user_id" name="user_id" value="{{ user[0] }}">
-                                        <button type="submit" value="Upload" class="btn p-0 m-0">
-                                            {{ user[3] }}
-                                        </button>
-                                    </form>
-                                </td>
-                            {% endif %}
+                {% if training_data %}
+                {% for user in training_data %}
+                    {% for role in user['training_data'] %}
+                        {% for course in role['course_info'] %}
+                            <tr>
+                                <td><i class="bi bi-circle-fill {{ 'text-success' if course['passed_course'] else 'text-danger' }}"></i></td>
+                                <td>{{ role['role_name'] }}</td>
+                                <td>{{ user['user_name'] }}</td>
+                                <td>{{ course['course_name'] }}</td>
+                                <td>{{ course['date_attended'] }}</td>
+                                <td>{{ course['date_expires'] }}</td>
+                                <td>{{ 'True' if course['passed'] else 'False' }}</td>
+                            </tr>
                         {% endfor %}
-                    {% else %}
-                        <td>No data available</td>
-                    {% endif %}
-
-
-                    {% if training_courses %}
-                        {% for course in training_courses %}
-                            {% if row[2] == course[0] %}
-                                <td>{{ course[1] }}</td>
-                            {% endif %}
-                        {% endfor %}
-                    {% else %}
-                        <td>No data available</td>
-                    {% endif %}
-
-                    <td>{{ row[4] }}</td>
-                    <td>{{ row[5] }}</td>
-                    <td>{{ 'True' if row[6] == 1 else 'False' }}</td>
-                </tr>
+                    {% endfor %}
                 {% endfor %}
             {% else %}
             <tr>

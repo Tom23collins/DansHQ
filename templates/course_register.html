@@ -23,7 +23,7 @@
                 <label for="description" class="form-label">Description</label>
                 <input type="text" class="form-control" id="description" name='description' required>
             </div>
-            <div class="mb-3">
+            <!-- <div class="mb-3">
                 <label for="duration" class="form-label">Duration (hrs : mins)</label>
                 <input type="time" class="form-control" id="duration" name='duration' required>
             </div>
@@ -42,7 +42,7 @@
                     <option value="">No course provider data available</option>
                     {% endif %}
                 </select>
-            </div>
+            </div> -->
             <button type="submit" class="btn btn-primary w-100 mb-3">Submit</button>
         </form>
           
@@ -57,9 +57,6 @@
               <tr>
                 <th scope="col">Name</th>
                 <th scope="col">Description</th>
-                <th scope="col">Duration</th>
-                <th scope="col">Mandatory</th>
-                <th scope="col">Course provider</th>
               </tr>
             </thead>
 
@@ -69,15 +66,6 @@
                 <tr>
                     <td>{{ row[1] }}</td>
                     <td>{{ row[2] }}</td>
-                    <td>{{ row[3] }}</td>
-                    <td>{{ 'True' if row[4] == 1 else 'False' }}</td>
-                    {% if course_providers %}
-                        {% for provider in course_providers %}
-                        <td>{{ provider[1] if row[5] == provider[0] else 'Provider not found' }}</td>
-                        {% endfor %}
-                    {% else %}
-                        <td>No data available</td>
-                    {% endif %}
                 </tr>
                 {% endfor %}
             {% else %}

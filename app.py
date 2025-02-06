@@ -5,11 +5,10 @@ import config
 import os
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
-from scripts import get_role_data_for_user
+from scripts import get_role_data_for_user, get_training_data
 from datetime import datetime
 
-# TODO: Training log requires all completed and not completed courses
-#       Data handling algorithms should be moved to the scripts folder out of views
+# TODO: Data handling algorithms should be moved to the scripts folder out of views
 #       See who can do the role inside of roles
 #       See who has completed training
 #       Filters on tables
@@ -51,7 +50,6 @@ def role_required(role):
                 return f(*args, **kwargs)
 
             if flask_login.current_user.user_role != role:
-                flash("You don't have the required role to access this page.")
                 return redirect(url_for('index'))
 
             return f(*args, **kwargs)
@@ -186,9 +184,12 @@ def user_settings():
 @role_required('office_staff')
 def training_register():
     if request.method == 'GET':
+
+        training_data = get_training_data(app)
+
         return render_template('training_register.html', 
                                 user=flask_login.current_user,
-                                training_log = db_query(app, 'SELECT * FROM training_log'),
+                                training_data = training_data,
                                 users = db_query(app, 'SELECT * FROM users'),
                                 training_courses = db_query(app, 'SELECT * FROM training_courses'))
     
