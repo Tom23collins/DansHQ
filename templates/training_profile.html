@@ -11,7 +11,7 @@
             {% if user_info %}
                 {% for row in user_info %}
                 <h5>{{ user_info[0][3] }}</h5>
-                <form action="{{ url_for('user_settings') }}" method='POST'>
+                <form action="{{ url_for('training_profile') }}" method='POST'>
                     <div class="mb-3 text-start">
                         <label for="email" class="form-label">Email</label>
                         <input type="text" class="form-control" id="email" name="email" value="{{ row[1] }}">
@@ -72,7 +72,7 @@
 
                 <thead>
                   <tr>
-                    <th scope="col">Qualified</th>
+                    <th scope="col"></th>
                     <th scope="col">Name</th>
                     <th scope="col">Description</th>
                     <th scope="col">Date attended</th>

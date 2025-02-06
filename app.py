@@ -5,14 +5,10 @@ import config
 import os
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
-from scripts import get_role_data_for_user, get_training_data
+from scripts import *
 from datetime import datetime
 
-# TODO: Data handling algorithms should be moved to the scripts folder out of views
-#       See who can do the role inside of roles
-#       See who has completed training
-#       Filters on tables
-#       delete roles
+# TODO Orange status/ expiring soon
 
 app = Flask(__name__)
 app.config.from_object(config)
@@ -93,71 +89,19 @@ def logout():
 @app.route('/')
 @flask_login.login_required
 def index():
-    return redirect(url_for('user_settings', user_id=flask_login.current_user.id))
+    return redirect(url_for('training_profile', user_id=flask_login.current_user.id))
 
-@app.route('/user-settings', methods=['GET', 'POST'])
+@app.route('/training-profile', methods=['GET', 'POST'])
 @flask_login.login_required
-def user_settings():
-    user_id = None
-
+def training_profile():
     if request.method == 'POST':
-        date_start = (
-        datetime.strptime(request.form.get('date_start'), '%Y-%m-%d').strftime('%Y-%m-%d') if request.form.get('date_start') else None
-        )
-        date_leave = (
-            datetime.strptime(request.form.get('date_leave'), '%Y-%m-%d').strftime('%Y-%m-%d') if request.form.get('date_leave') else None
-        )
 
-        # Update user details
-
-        user_id = request.form['user_id']
-
-        sql = """
-        UPDATE users
-        SET email = %s, name = %s, phone = %s, date_start = %s, date_leave = %s
-        WHERE id = %s
-        """
-
-        values = (
-            request.form.get('email'),
-            request.form.get('name'),
-            request.form.get('phone'),
-            date_start,
-            date_leave,
-            user_id,
-        )
-
-        db_update(app, sql, values)
-
-        #  Update user roles
-
-        role_ids = db_query(app, sql = "SELECT role_id FROM roles")
-
-        sql = """
-        DELETE FROM user_roles
-        WHERE user_id = %s
-        """
-
-        values = [user_id]
-
-        db_update(app, sql, values)
-
-        for role in role_ids:
-            role_id = role[0]
-            role_assigned = request.form.get(f'is_mandatory_{role_id}')
-            if role_assigned != None:
-                sql = """
-                INSERT INTO user_roles (`user_id`, `role_id`)
-                VALUES (%s, %s)
-                """
-                values = (
-                    user_id,
-                    role_id,
-                )
-
-                db_update(app, sql, values)
-
-        return redirect(url_for('user_settings', user_id=user_id))
+        update_user_details(app, request)
+        update_user_roles(app, request)
+    
+        return redirect(url_for('training_profile', 
+                                user_id = request.form['user_id']
+                                ))
     
     if request.method == 'GET':
         user_id = request.args.get('user_id')
@@ -167,7 +111,7 @@ def user_settings():
         all_roles = db_query(app, 'SELECT * FROM roles')
 
         return render_template(
-            'user_settings.html',   
+            'training_profile.html',   
             user=flask_login.current_user,
             user_id=user_id,
             user_info = user_info,
@@ -177,9 +121,9 @@ def user_settings():
             result_data=get_role_data_for_user(app, user_id)
         )
 
-    return redirect(url_for('user_settings', user_id=user_id))
+    return redirect(url_for('training_profile', user_id=user_id))
 
-@app.route('/training_register', methods=['GET', 'POST'])
+@app.route('/training-register', methods=['GET', 'POST'])
 @flask_login.login_required
 @role_required('office_staff')
 def training_register():
@@ -306,43 +250,37 @@ def role_settings():
 
     return redirect(url_for('role_settings'))
 
-@app.route('/course_register', methods=['GET', 'POST'])
+@app.route('/training-courses', methods=['GET', 'POST'])
 @flask_login.login_required
 @role_required('office_staff')
-def course_register():
+def training_courses():
 
     if request.method == 'GET':
-        return render_template('course_register.html', 
+        return render_template('training_courses.html', 
                                user=flask_login.current_user, 
-                               course_providers=db_query(app, 'SELECT * FROM course_providers'),
                                course_register = db_query(app, 'SELECT * FROM training_courses'))
-    
-    is_mandatory = 1 if request.form['is_mandatory'] == 'on' else 0
 
     sql = """
-    INSERT INTO training_courses (`name`, `description`, `duration`, `is_mandatory`, `course_provider_id`)
-    VALUES (%s, %s, %s, %s, %s)
+    INSERT INTO training_courses (`name`, `description`)
+    VALUES (%s, %s)
     """
     values = (
         request.form['name'],
         request.form['description'],
-        request.form['duration'],
-        is_mandatory,
-        request.form['course_provider_id'],
     )
 
     db_update(app, sql, values)
-    return redirect(url_for('course_register'))
+    return redirect(url_for('training_courses'))
 
 
-@app.route('/settings', methods=['GET', 'POST'])
+@app.route('/users', methods=['GET', 'POST'])
 @role_required('office_staff')
 @flask_login.login_required
-def settings():
+def users():
     users = db_query(app, 'SELECT * FROM users')
 
     if request.method == 'GET':
-        return render_template('settings.html', user=flask_login.current_user, users=users)
+        return render_template('users.html', user=flask_login.current_user, users=users)
     
     # Add user to database
 
@@ -360,7 +298,7 @@ def settings():
 
     db_update(app, sql, values)
 
-    return redirect(url_for('settings'))
+    return redirect(url_for('users'))
 
 @app.route('/admin-settings', methods=['GET', 'POST'])
 @role_required('administrator')

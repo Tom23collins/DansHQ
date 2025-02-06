@@ -5,3 +5,26 @@
 .nav-link:hover {
     text-decoration: underline;
 }
+
+ .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+ .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+     color: #FFFFFF !important;
+     background-color: #082C65;
+     background: #082C65;
+     border: none !important;
+ }
+
+ .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+     box-sizing: border-box;
+     display: inline-block;
+     min-width: 1.5em;
+     padding: .5em 1em;
+     margin-left: 2px;
+     text-align: center;
+     text-decoration: none !important;
+     cursor: pointer;
+     color: #333 !important;
+     background: none;
+     border: 1px solid transparent;
+     border-radius: 2px;
+ }
