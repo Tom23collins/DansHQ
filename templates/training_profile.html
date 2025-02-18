@@ -84,7 +84,16 @@
                 <tbody>
                     {% for course in role['course_info'] %}
                         <tr>
-                            <td><i class="bi bi-circle-fill {{ 'text-success' if course['passed_course'] else 'text-danger' }}"></i></td>
+                            <td>
+                                <i class="bi bi-circle-fill {% if course['course_status'] == True %}
+                                        text-success
+                                    {% elif course['course_status'] == 'Expiring Soon' %}
+                                        text-warning
+                                    {% else %}
+                                        text-danger
+                                    {% endif %}
+                                "></i>
+                            </td>
                             <td>{{ course['course_name'] }}</td>
                             <td>{{ course['course_desc'] }}</td>
                             <td>{{ course['date_attended'] }}</td>

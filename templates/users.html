@@ -1,7 +1,7 @@
-<!-- templates/settings.html -->
+<!-- templates/users.html -->
 {% extends "base.html" %}
 
-{% block title %}Settings · DansHQ{% endblock %}
+{% block title %}Users · DansHQ{% endblock %}
 
 {% block content %}
 
@@ -13,7 +13,7 @@
 
         <h3>Create a new user</h3>
         
-        <form action='settings' method='POST' autocomplete="new-password">
+        <form action='users' method='POST' autocomplete="new-password">
             <div class="mb-3 text-start">
               <label for="name" class="form-label">Name*</label>
               <input type="text" class="form-control" id="name" name='name' required>
@@ -63,7 +63,7 @@
                 {% if users %}
                 {% for row in users %}
                 <tr>
-                    <td><a class="btn m-0 p-0" href="{{  url_for('user_settings', user_id=row[0]) }}"><i class="bi bi-pencil-square"></i></a></td>
+                    <td><a class="btn m-0 p-0" href="{{  url_for('training_profile', user_id=row[0]) }}"><i class="bi bi-pencil-square"></i></a></td>
                     <td>{{ row[3] }}</td>
                     <td>{{ row[1] }}</td>
                     <td>{{ row[4] }}</td>

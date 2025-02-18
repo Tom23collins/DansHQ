@@ -36,7 +36,7 @@
 
         <h3>Record training</h3>
         
-        <form action='training_register' method='POST'>
+        <form action='training-register' method='POST'>
             <div class="mb-3">
                 <label for="user_id" class="form-label">User</label>
                 <select id="user_id" name="user_id" class="form-control" required>
@@ -101,7 +101,16 @@
                     {% for role in user['training_data'] %}
                         {% for course in role['course_info'] %}
                             <tr>
-                                <td><i class="bi bi-circle-fill {{ 'text-success' if course['passed_course'] else 'text-danger' }}"></i></td>
+                                <td>
+                                    <i class="bi bi-circle-fill {% if course['course_status'] == True %}
+                                            text-success
+                                        {% elif course['course_status'] == 'Expiring Soon' %}
+                                            text-warning
+                                        {% else %}
+                                            text-danger
+                                        {% endif %}
+                                    "></i>
+                                </td>
                                 <td>{{ role['role_name'] }}</td>
                                 <td>{{ user['user_name'] }}</td>
                                 <td>{{ course['course_name'] }}</td>

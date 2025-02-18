@@ -1,5 +1,5 @@
 from db import db_query_values
-from datetime import datetime
+from datetime import datetime, timedelta
 
 def get_training_data(app, course_id, user_id):
 
@@ -17,15 +17,21 @@ def get_training_data(app, course_id, user_id):
 
     return training_data
 
-def has_user_passed_course(training_data):
+def get_course_status(training_data):
     date_expires = training_data[0][5]
     passed = training_data[0][6]
     
-    if passed and date_expires > datetime.today().date():  
-        return True  
+    if not passed:
+        return False
+    
+    today = datetime.today().date()
+    
+    if date_expires > today:
+        if date_expires <= today + timedelta(days=180):  # 6 months = 180 days
+            return "Expiring Soon"
+        return True
     
     return False
-
 def get_role_data_for_user(app, user_id):
     role_data = []
     user_roles = db_query_values(app, 'SELECT role_id FROM user_roles WHERE user_id = %s', (user_id,))
@@ -49,7 +55,7 @@ def get_role_data_for_user(app, user_id):
                 qualified = False
                 required_course_data.append({
                     "course_id": course_data[0],
-                    "passed_course": False,
+                    "course_status": False,
                     "course_name": course_data[1],
                     "course_desc": course_data[2],
                     "date_attended": None,
@@ -59,7 +65,7 @@ def get_role_data_for_user(app, user_id):
             else:
                 required_course_data.append({
                     "course_id": course_data[0],
-                    "passed_course": has_user_passed_course(training_data),
+                    "course_status": get_course_status(training_data),
                     "course_name": course_data[1],
                     "course_desc": course_data[2],
                     "date_attended": training_data[0][4],
