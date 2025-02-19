@@ -129,13 +129,16 @@ def training_profile():
 def training_register():
     if request.method == 'GET':
 
-        training_data = get_training_data(app)
+        training_data = get_fully_qualified(app)
 
         return render_template('training_register.html', 
                                 user=flask_login.current_user,
                                 training_data = training_data,
                                 users = db_query(app, 'SELECT * FROM users'),
                                 training_courses = db_query(app, 'SELECT * FROM training_courses'))
+    
+    if request.method == 'POST' and 'download' in request.form:
+        return download_training_data(app)
     
     passed = 1 if request.form['passed'] == 'on' else 0
     
@@ -249,6 +252,30 @@ def role_settings():
         )
 
     return redirect(url_for('role_settings'))
+
+@app.route('/providers', methods=['GET', 'POST'])
+@flask_login.login_required
+@role_required('office_staff')
+def providers():
+
+    if request.method == 'GET':
+        return render_template('providers.html', 
+                               user=flask_login.current_user, 
+                               providers = db_query(app, 'SELECT * FROM providers'))
+    
+
+    sql = """
+    INSERT INTO providers (`providersname`, `providerscontact`)
+    VALUES (%s, %s)
+    """
+    values = (
+        request.form['name'],
+        request.form['contact'],
+    )
+
+    db_update(app, sql, values)
+
+    return redirect(url_for('providers'))
 
 @app.route('/training-courses', methods=['GET', 'POST'])
 @flask_login.login_required

@@ -1,9 +1,7 @@
-<!-- templates/roles.html -->
+<!-- templates/providers.html -->
 {% extends "base.html" %}
 
 {% block content %}
-
-{% include "nav.html" %}
 
 <div class="d-flex gap-3 mt-5">
 
@@ -11,14 +9,14 @@
 
         <h3>Create a new course provider</h3>
         
-        <form action='course_providers' method='POST'>
+        <form action='providers' method='POST'>
             <div class="mb-3 text-start">
               <label for="name" class="form-label">Provider name</label>
               <input type="text" class="form-control" id="name" name='name' required>
             </div>
             <div class="mb-3 text-start">
-              <label for="phone" class="form-label">Phone number</label>
-              <input type="tel" class="form-control" id="phone" name="phone">
+              <label for="contact" class="form-label">Contact details</label>
+              <input type="text" class="form-control" id="contact" name="contact">
             </div>
             <button type="submit" class="btn btn-primary w-100 mb-3">Submit</button>
         </form>
@@ -33,13 +31,13 @@
             <thead>
               <tr>
                 <th scope="col">Provider name</th>
-                <th scope="col">Phone number</th>
+                <th scope="col">Contact details</th>
               </tr>
             </thead>
 
             <tbody>
-                {% if course_providers %}
-                {% for row in course_providers %}
+                {% if providers %}
+                {% for row in providers %}
                 <tr>
                     <td>{{ row[1] }}</td>
                     <td>{{ row[2] }}</td>
