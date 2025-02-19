@@ -8,7 +8,18 @@ from functools import wraps
 from scripts import *
 from datetime import datetime
 
-# TODO Orange status/ expiring soon
+# TODO
+# Calculate status of each role
+# Check modals work
+# rename files and simplify code
+# Reimplement providers as a field in courses
+# Add adhoc training to users
+# Add Expirations, evidence, roles, method, provider, cost estimate, time esitmate to courses table
+# Archived personel and roles
+# Time/ cost estimates in reporting
+# Individual training report
+# Upload evidence
+# Style tables
 
 app = Flask(__name__)
 app.config.from_object(config)
@@ -166,7 +177,7 @@ def roles():
     if request.method == 'GET':
         return render_template('roles.html', 
                                user=flask_login.current_user, 
-                               roles = db_query(app, 'SELECT * FROM roles'))
+                               roles = get_roles(app))
     
 
     sql = """
