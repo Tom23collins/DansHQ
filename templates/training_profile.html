@@ -3,6 +3,21 @@
 
 {% block title %}{{ user_info[0][3] }} · DansHQ{% endblock %}
 
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        // Show modal on button click
+        $("#addTrainingBtn").click(function() {
+            $("#addTrainingModal").modal('show');
+        });
+    });
+</script>
+
+{% endblock %}
+
 {% block content %}
 <div class="d-flex gap-3 mt-5">
 
@@ -61,6 +76,10 @@
    </div>
 
    <div class="col-8 px-3">
+        <nav class="navbar p-0 mb-3">
+            <h5 class="mb-0">Roles and Qualifications</h5>
+            <button class="btn btn-primary" id="addTrainingBtn"><i class="bi bi-plus-circle"></i> Add new training</button>
+        </nav>
 
         {% for role in result_data %}
         <div class="row bg-white p-3 rounded border mb-4">
@@ -113,7 +132,66 @@
 
    </div>
 
+<!-- MODAL: Add New Training -->
+<div class="modal fade" id="addTrainingModal" tabindex="-1" aria-labelledby="addTrainingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addTrainingModalLabel">Add New Training</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
 
+            <div class="modal-body">
+                <form action='training-register' method='POST'>
+                    <div class="mb-3">
+                        <label for="user_id" class="form-label">User</label>
+                        <select id="user_id" name="user_id" class="form-control" required>
+                            <option value="" disabled selected>Select a trainee</option>
+                            {% if users %}
+                                {% for row in users %}
+                                    <option value="{{ row[0] }}">{{ row[3] }}</option>
+                                {% endfor %}
+                            {% else %}
+                                <option value="">No course provider data available</option>
+                            {% endif %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="training_id" class="form-label">Training course</label>
+                        <select id="training_id" name="training_id" class="form-control" required>
+                            <option value="" disabled selected>Select a training course</option>
+                            {% if training_courses %}
+                                {% for row in training_courses %}
+                                    <option value="{{ row[0] }}">{{ row[1] }}</option>
+                                {% endfor %}
+                            {% else %}
+                                <option value="">No course data available</option>
+                            {% endif %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3 text-start">
+                        <label for="date_attended" class="form-label">Date attended</label>
+                        <input type="date" class="form-control" id="date_attended" name="date_attended" required>
+                    </div>
+
+                    <div class="mb-3 text-start">
+                        <label for="date_expires" class="form-label">Date expires</label>
+                        <input type="date" class="form-control" id="date_expires" name="date_expires" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <input type="checkbox" class="form-check-input" id="passed" name="passed">
+                        <label class="form-check-label" for="passed">Course passed</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 mb-3">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 </div>
 {% endblock %}
