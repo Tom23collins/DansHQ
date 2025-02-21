@@ -8,25 +8,46 @@
 <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
 
 <script>
-    $(document).ready(function() {
+    document.addEventListener('DOMContentLoaded', () => {
         // Show modal on button click
-        $("#addTrainingBtn").click(function() {
-            $("#addTrainingModal").modal('show');
-        });
+        const addTrainingBtn = document.getElementById('addTrainingBtn');
+        if (addTrainingBtn) {
+            addTrainingBtn.addEventListener('click', () => {
+                const addTrainingModal = document.getElementById('addTrainingModal');
+                if (addTrainingModal) {
+                    new bootstrap.Modal(addTrainingModal).show();
+                }
+            });
+        }
+
+        // Role filtering
+        const roleSelect = document.getElementById('roleSelect');
+        if (roleSelect) {
+            roleSelect.addEventListener('change', () => {
+                const selectedRole = roleSelect.value;
+                document.querySelectorAll('.role-card').forEach(card => {
+                    card.style.display = (selectedRole === 'all' || card.getAttribute('data-role') === selectedRole) ? 'block' : 'none';
+                });
+            });
+        }
+
+        // Disable horizontal scrollbar
+        document.documentElement.style.overflowX = 'hidden';
+        document.body.style.overflowX = 'hidden';
     });
 </script>
-
 {% endblock %}
 
 {% block content %}
-<div class="d-flex gap-3 mt-5">
+<div class="d-flex gap-3 mt-5 w-100" style="width: 100vw;">
 
-   <div class="col-4 px-3">
-        <div class="row bg-white p-3 rounded border">
+   <div class="col-3 px-3">
+        <div class="row bg-white p-3 rounded border text-center mb-4">
             {% if user_info %}
                 {% for row in user_info %}
+                <i class="bi bi-person-circle" style="font-size: 80px;"></i>
                 <h5>{{ user_info[0][3] }}</h5>
-                <form action="{{ url_for('training_profile') }}" method='POST'>
+                <!-- <form action="{{ url_for('training_profile') }}" method='POST'>
                     <div class="mb-3 text-start">
                         <label for="email" class="form-label">Email</label>
                         <input type="text" class="form-control" id="email" name="email" value="{{ row[1] }}">
@@ -46,10 +67,10 @@
                     <div class="mb-3 text-start">
                         <label for="date_leave" class="form-label">Date leave</label>
                         <input type="date" class="form-control" id="date_leave" name="date_leave" value="{{ row[6] }}" maxlength="10">
-                    </div>
-                    <p>Assign roles</p>
+                    </div> -->
                     {% for row in roles %}
-                        <div class="mb-3">
+                        <p class="rounded-pill bg-primary text-light">{{ row[1] }}</p>
+                        <!-- <div class="mb-3">
                             <input 
                                 type="checkbox" 
                                 class="form-check-input" 
@@ -59,12 +80,12 @@
                             <label 
                                 class="form-check-label" 
                                 for="is_mandatory_{{ row[0] }}">{{ row[1] }}</label>
-                        </div>
+                        </div> -->
                     {% endfor %}
-                    <input type="hidden" id="user_id" name="user_id" value="{{ user_id }}">
+                    <!-- <input type="hidden" id="user_id" name="user_id" value="{{ user_id }}">
                     {% if user.user_role != 'user' %}
                     <button type="submit" class="btn btn-primary w-100 mb-3">Update details</button>
-                    {% endif %}
+                    {% endif %} -->
                 </form>
                 {% endfor %}
             {% else %}
@@ -73,62 +94,92 @@
             </tr>
         {% endif %}
         </div>
+
+        <div class="row bg-white p-3 rounded border mb-4">
+            <h5>Personnel details</h5>
+            {% if user_info %}
+                {% for row in user_info %}
+                    <h6>Email</h6>
+                    <p>{{ row[1] }}</p>
+                    <h6>Phone</h6>
+                    <p>{{ row[4] }}</p>
+                    <h6>Date start</h6>
+                    <p>{{ row[5] }}</p>
+                {% endfor %}
+            {% else %}
+                <p>No user data available</p>
+            {% endif %}
+        </div>
    </div>
 
-   <div class="col-8 px-3">
-        <nav class="navbar p-0 mb-3">
-            <h5 class="mb-0">Roles and Qualifications</h5>
-            <button class="btn btn-primary" id="addTrainingBtn"><i class="bi bi-plus-circle"></i> Add new training</button>
-        </nav>
-
-        {% for role in result_data %}
+   <div class="col-9 px-3">
         <div class="row bg-white p-3 rounded border mb-4">
+            <select id="roleSelect" class="form-select w-100" onchange="filterRoles()">
+                <option value="all">All roles</option>
+                {% for role in result_data %}
+                    <option value="{{ role['role_name'] }}">{{ role['role_name'] }}</option>
+                {% endfor %}
+            </select>
+        </div>
 
-            <h5><i class="bi bi-circle-fill {{ 'text-success' if role['qualified'] else 'text-danger' }}"></i> {{ role['role_name'] }}</h5>
+        <div id="rolesContainer">
+            {% for role in result_data %}
+                <div class="row bg-white p-3 rounded border mb-4 role-card" data-role="{{ role['role_name'] }}">
+        
+                    <h5><i class="bi bi-circle-fill {{ 'text-success' if role['qualified'] else 'text-danger' }}"></i> {{ role['role_name'] }}</h5>
+                    
+                    {% if role['course_info'] %}
+                    <table class="table">
+        
+                        <thead>
+                          <tr>
+                            <th scope="col"></th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Date attended</th>
+                            <th scope="col">Date expires</th>
+                            <th scope="col">Passed</th>
+                          </tr>
+                        </thead>
             
-            {% if role['course_info'] %}
-            <table class="table">
+                        <tbody>
+                            {% for course in role['course_info'] %}
+                                <tr>
+                                    <td>
+                                        <i class="bi bi-circle-fill {% if course['course_status'] == True %}
+                                                text-success
+                                            {% elif course['course_status'] == 'Expiring Soon' %}
+                                                text-warning
+                                            {% else %}
+                                                text-danger
+                                            {% endif %}
+                                        "></i>
+                                    </td>
+                                    <td>{{ course['course_name'] }}</td>
+                                    <td>{{ course['course_desc'] }}</td>
+                                    <td>{{ course['date_attended'] }}</td>
+                                    <td>{{ course['date_expires'] }}</td>
+                                    <td>{{ 'True' if course['passed'] else 'False' }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                        
+                    </table>
+                    {% else %}
+                        <p>No required courses for this role, add some!</p>
+                    {% endif %}
+        
+                </div>
+            {% endfor %}
+        </div>
 
-                <thead>
-                  <tr>
-                    <th scope="col"></th>
-                    <th scope="col">Name</th>
-                    <th scope="col">Description</th>
-                    <th scope="col">Date attended</th>
-                    <th scope="col">Date expires</th>
-                    <th scope="col">Passed</th>
-                  </tr>
-                </thead>
-    
-                <tbody>
-                    {% for course in role['course_info'] %}
-                        <tr>
-                            <td>
-                                <i class="bi bi-circle-fill {% if course['course_status'] == True %}
-                                        text-success
-                                    {% elif course['course_status'] == 'Expiring Soon' %}
-                                        text-warning
-                                    {% else %}
-                                        text-danger
-                                    {% endif %}
-                                "></i>
-                            </td>
-                            <td>{{ course['course_name'] }}</td>
-                            <td>{{ course['course_desc'] }}</td>
-                            <td>{{ course['date_attended'] }}</td>
-                            <td>{{ course['date_expires'] }}</td>
-                            <td>{{ 'True' if course['passed'] else 'False' }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-                
-            </table>
-            {% else %}
-                <p>No required courses for this role, add some!</p>
-            {% endif %}
+        <div class="row bg-white p-3 rounded border mb-4">
+            <nav class="navbar p-0 mb-3">
+                <h5>Additional training</h5>
+                <button class="btn btn-primary" id="addTrainingBtn"><i class="bi bi-plus-circle"></i> Add new training</button>
+            </nav>
 
         </div>
-        {% endfor %}
 
    </div>
 

@@ -20,6 +20,7 @@ from datetime import datetime
 # Individual training report
 # Upload evidence
 # Style tables
+# Label data being parsed into html (training profile)
 
 app = Flask(__name__)
 app.config.from_object(config)

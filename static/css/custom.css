@@ -46,6 +46,11 @@
     --bs-btn-disabled-border-color: #082C65;
 }
 
+:root {
+    --bs-primary: #082C65;
+    --bs-primary-rgb: 8, 44, 101;
+}
+
 .bg-body-custom {
     background: rgb(223,223,223); 
     background: linear-gradient(45deg, rgba(211,241,255,1) 0%, rgba(223,223,223,1) 50%, rgba(211,241,255,1) 100%);
