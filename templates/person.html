@@ -1,5 +1,5 @@
 <!-- templates/settings.html -->
-{% extends "base.html" %}
+{% extends "global/base.html" %}
 
 {% block title %}{{ user_info[0][3] }} · DansHQ{% endblock %}
 
@@ -25,17 +25,16 @@
     const roleCards = document.querySelectorAll('.role-card');
 
     if (roleSelect && roleCards.length > 0) {
-        // Set default selection to the first role in the dropdown
-        roleSelect.selectedIndex = 1;
+        roleSelect.selectedIndex = 0;
         const defaultRole = roleSelect.value;
         let firstMatch = true;
 
         roleCards.forEach(card => {
             if (card.getAttribute('data-role') === defaultRole && firstMatch) {
-                card.style.display = 'block'; // Show only the first training card
+                card.style.display = 'block';
                 firstMatch = false;
             } else {
-                card.style.display = 'none'; // Hide others
+                card.style.display = 'none';
             }
         });
 
@@ -71,56 +70,23 @@
         <div class="row bg-white p-3 rounded border text-center mb-4">
             {% if user_info %}
                 {% for row in user_info %}
-                <i class="bi bi-person-circle" style="font-size: 80px;"></i>
-                <h5>{{ user_info[0][3] }}</h5>
-                <!-- <form action="{{ url_for('training_profile', user_id=user_id) }}" method='POST'>
-                    <div class="mb-3 text-start">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="text" class="form-control" id="email" name="email" value="{{ row[1] }}">
-                    </div>
-                    <div class="mb-3 text-start">
-                        <label for="name" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="name" name="name" value="{{ row[3] }}">
-                    </div>
-                    <div class="mb-3 text-start">
-                        <label for="phone" class="form-label">Phone number</label>
-                        <input type="text" class="form-control" id="phone" name="phone" value="{{ row[4] }}">
-                    </div>
-                    <div class="mb-3 text-start">
-                        <label for="date_start" class="form-label">Date start</label>
-                        <input type="date" class="form-control" id="date_start" name="date_start" value="{{ row[5] }}" maxlength="10">
-                    </div>
-                    <div class="mb-3 text-start">
-                        <label for="date_leave" class="form-label">Date leave</label>
-                        <input type="date" class="form-control" id="date_leave" name="date_leave" value="{{ row[6] }}" maxlength="10">
-                    </div> -->
+                    <i class="bi bi-person-circle" style="font-size: 80px;"></i>
+                    <h5>{{ user_info[0][3] }}</h5>
                     {% for row in roles %}
                         {% if row[0] in user_roles | map(attribute=0) %}
-                            <p class="m-0"><p class="rounded-pill bg-primary text-light w-auto m-auto mb-0">{{ row[1] }}</p></p>
+                            <p class="m-0">
+                                <p class="rounded-pill bg-secondary text-light w-auto m-auto mb-0">
+                                    {{ row[1] }}
+                                </p>
+                            </p>
                         {% endif %}
-                        <!-- <div class="mb-3">
-                            <input 
-                                type="checkbox" 
-                                class="form-check-input" 
-                                id="is_mandatory_{{ row[0] }}" 
-                                name="is_mandatory_{{ row[0] }}" 
-                                {% if row[0] in user_roles | map(attribute=0) %} checked {% endif %}>
-                            <label 
-                                class="form-check-label" 
-                                for="is_mandatory_{{ row[0] }}">{{ row[1] }}</label>
-                        </div> -->
                     {% endfor %}
-                    <!-- <input type="hidden" id="user_id" name="user_id" value="{{ user_id }}">
-                    {% if user.user_role != 'user' %}
-                    <button type="submit" class="btn btn-primary w-100 mb-3">Update details</button>
-                    {% endif %} -->
-                </form>
                 {% endfor %}
             {% else %}
-            <tr>
-                <td colspan="6">No user data available</td>
-            </tr>
-        {% endif %}
+                <tr>
+                    <td colspan="6">No user data available</td>
+                </tr>
+            {% endif %}
         </div>
 
         <div class="row bg-white p-3 rounded border mb-4">
@@ -144,7 +110,9 @@
         <div class="row bg-white p-3 rounded border mb-4">
             <select id="roleSelect" class="form-select w-100">
                 {% for role in result_data %}
-                    <option value="{{ role['role_name'] }}">{{ role['role_name'] }}</option>
+                    <option value="{{ role['role_name'] }}">
+                        {{ role['role_name'] }}
+                    </option>
                 {% endfor %}
             </select>
         </div>
@@ -153,7 +121,7 @@
             {% for role in result_data %}
                 <div class="row bg-white p-3 rounded border mb-4 role-card" data-role="{{ role['role_name'] }}">
         
-                    <h5><i class="bi bi-circle-fill {{ 'text-success' if role['qualified'] else 'text-danger' }}"></i> {{ role['role_name'] }}</h5>
+                    <h5> {{ role['role_name'] }}</h5>
                     
                     {% if role['course_info'] %}
                     <table class="table">

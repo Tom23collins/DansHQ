@@ -19,7 +19,7 @@ def update_user_roles(app, request):
         role_assigned = request.form.get(f'is_mandatory_{role_id}')
         if role_assigned != None:
             sql = """
-            INSERT INTO user_roles (`user_id`, `role_id`)
+            INSERT INTO users_roles (`user_id`, `role_id`)
             VALUES (%s, %s)
             """
             values = (

@@ -57,3 +57,18 @@
     min-height: 100vh;
     width: 100vw;
 }
+
+#roles_table_filter,  
+#training_register_filter,
+#courses_filter {
+    display: none !important;
+}
+
+.shadow-danger {text-shadow: 0 0 10px rgba(226, 55, 72, 0.5);}
+.shadow-danger:hover {text-shadow: 0 0 10px rgba(226, 55, 72, 1);}
+
+.shadow-warning {text-shadow: 0 0 10px rgba(255, 193, 7, 0.5);}
+.shadow-warning:hover {text-shadow: 0 0 10px rgba(255, 193, 7, 1);}
+
+.shadow-success {text-shadow: 0 0 10px rgba(25, 135, 84, 0.5);}
+.shadow-success:hover {text-shadow: 0 0 10px rgba(25, 135, 84, 1);}

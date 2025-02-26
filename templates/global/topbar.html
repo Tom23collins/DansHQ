@@ -5,11 +5,11 @@
           <span class="fw-bold">{{ user.name }}</span>
         </button>
         <ul class="dropdown-menu dropdown-menu-end">
-          <li><a class="dropdown-item" href="{{  url_for('training_profile', user_id=user.id) }}"><i class="bi bi-person-fill"></i> Training profile</a></li>
+          <li><a class="dropdown-item" href="{{  url_for('person', user_id=user.id) }}"><i class="bi bi-person-fill"></i> Training profile</a></li>
           <li><a class="dropdown-item" href="{{  url_for('logout') }}"><i class="bi bi-door-closed-fill"></i> Log out</a></li>
 
           {% if user.user_role == 'administrator' %}
-          <li><a class="dropdown-item" href="{{  url_for('admin_settings') }}"><i class="bi bi-gear-wide-connected"></i> Admin settings</a></li>
+          <li><a class="dropdown-item" href="{{  url_for('settings') }}"><i class="bi bi-gear-wide-connected"></i> Admin settings</a></li>
           {% endif %}
         </ul>
       </div>

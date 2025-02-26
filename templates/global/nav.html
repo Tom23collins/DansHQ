@@ -12,20 +12,14 @@
         <ul class="navbar-nav">
           {% if user.user_role != 'user' %}
           <li class="nav-item">
-            <a class="nav-link text-light" href="{{  url_for('training_register') }}">Personnel</a>
+            <a class="nav-link text-light" href="{{  url_for('personnel') }}">Personnel</a>
           </li>
           <li class="nav-item">
             <a class="nav-link text-light" href="{{  url_for('roles') }}">Roles</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-light" href="{{  url_for('training_courses') }}">Training courses</a>
+            <a class="nav-link text-light" href="{{  url_for('courses') }}">Courses</a>
           </li>
-          <!-- <li class="nav-item">
-            <a class="nav-link text-light" href="{{  url_for('users') }}">Users</a>
-          </li> -->
-          <!-- <li class="nav-item">
-            <a class="nav-link text-light" href="{{  url_for('providers') }}">Providers</a>
-          </li> -->
           {% endif %}
         </ul>
       </div>

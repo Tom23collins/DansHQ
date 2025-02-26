@@ -1,0 +1,147 @@
+<!-- templates/roles.html -->
+{% extends "global/base.html" %}
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" />
+
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        var table = $('#courses').DataTable({
+            paging: true,
+            pagingType: "simple_numbers",
+            pageLength: 10,
+            lengthChange: false,
+            ordering: false,
+            info: false,
+            searching: true,
+            scrollCollapse: true,
+            columnDefs: [
+                { searchable: false, orderable: false, targets: [0, 3] }
+            ],
+        });
+
+        $("#addUserBtn").click(function() {
+            $("#createUserModal").modal('show');
+        });
+
+        $("#searchBox").keyup(function() {
+            table.search($(this).val()).draw();
+        });
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex gap-3 mt-5">
+    <div class="col-12 bg-white p-3 rounded border">
+        <nav class="navbar p-0 mb-3">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" id="searchBox" class="form-control" placeholder="Search courses">
+                </div>
+            </div>
+            <button class="btn btn-primary" id="addUserBtn"><i class="bi bi-person-plus"></i> Add new course</button>
+        </nav>
+        <table class="table table-hover table-sm table-responsive" id="courses">
+
+            <thead>
+              <tr>
+                <th scope="col">Status</th>
+                <th scope="col">Course</th>
+                <th scope="col">Type</th>
+                <th scope="col">Provider</th>
+                <th scope="col">Renewal frequency</th>
+              </tr>
+            </thead>
+
+            <tbody>
+                {% if course_register %}
+                {% for course in course_register %}
+                <tr onclick="window.location.href='{{ url_for('course', course_id=course['id']) }}';" style="cursor: pointer;">
+                    <td><i class="bi bi-circle-fill text-danger shadow-danger"></i></td>
+                    <td>{{ course['name'] }}</td>
+                    <td>{{ course['method'] }}</td>
+                    <td>{{ course['provider'] }}</td>
+                    <td>{{ course['renewal'] }}</td>
+                </tr>
+                {% endfor %}
+            {% else %}
+            <tr>
+                <td colspan="6">No course data available</td>
+            </tr>
+            {% endif %}
+            </tbody>
+
+          </table>
+
+    </div>
+</div>
+
+<div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createUserModalLabel">Add a new course</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <form action='courses' method='POST' autocomplete="new-password">
+                    <div class="mb-3 text-start">
+                        <label for="name" class="form-label">Course name*</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                
+                    <div class="form-check mb-3 text-start p-0">
+                        <input class="evidence" type="checkbox" value="1" id="expires" name="expires">
+                        <label class="evidence" for="expires">Training expires</label>
+                    </div>
+                
+                    <div class="mb-3 text-start">
+                        <label for="renewal" class="form-label">Renewal Frequency</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="renewal" name="renewal" placeholder="Enter renewal period" min="1" required>
+                            <select class="form-select" id="timeUnit" name="timeUnit">
+                                <option value="month(s)" selected>Month(s)</option>
+                                <option value="year(s)">Year(s)</option>
+                            </select>
+                        </div>
+                    </div>
+                
+                    <div class="mb-3 text-start">
+                        <label for="method" class="form-label">Method</label>
+                        <select class="form-control" id="method" name="method">
+                            <option value="Internal">Internal</option>
+                            <option value="External">External</option>
+                            <option value="Online">Online</option>
+                        </select>
+                    </div>
+                
+                    <div class="mb-3 text-start">
+                        <label for="provider" class="form-label">Provider</label>
+                        <input type="text" class="form-control" id="provider" name="provider">
+                    </div>
+                
+                    <div class="mb-3 text-start">
+                        <label for="cost" class="form-label">Cost estimate</label>
+                        <div class="input-group">
+                            <span class="input-group-text">£</span>
+                            <input type="number" class="form-control" id="cost" name="cost" placeholder="Enter cost">
+                        </div>
+                    </div>
+                
+                    <button type="submit" class="btn btn-primary w-100 mb-3">Submit</button>
+                </form>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

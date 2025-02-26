@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 def get_training_data(app, course_id, user_id):
 
     sql = """
-        SELECT * FROM training_log
+        SELECT * FROM training
         WHERE user_id = %s AND training_id = %s
         """
 
@@ -35,20 +35,20 @@ def get_course_status(training_data):
 
 def get_role_data_for_user(app, user_id):
     role_data = []
-    user_roles = db_query_values(app, 'SELECT role_id FROM user_roles WHERE user_id = %s', (user_id,))
+    user_roles = db_query_values(app, 'SELECT role_id FROM users_roles WHERE user_id = %s', (user_id,))
 
     for role_id in user_roles:
 
         qualified = True
 
         role_info = db_query_values(app, 'SELECT * FROM roles WHERE role_id = %s', (role_id[0],))[0]
-        required_course_ids = db_query_values(app, 'SELECT * FROM role_requirements WHERE role_id = %s', (role_id[0],))
+        required_course_ids = db_query_values(app, 'SELECT * FROM roles_courses WHERE role_id = %s', (role_id[0],))
 
         required_course_data = []
 
         for required_course in required_course_ids:
             course_id = required_course[2]
-            course_data = db_query_values(app, 'SELECT * FROM training_courses WHERE id = %s', (course_id,))[0]
+            course_data = db_query_values(app, 'SELECT * FROM courses WHERE id = %s', (course_id,))[0]
 
             training_data = get_training_data(app, course_id, user_id)
 
@@ -63,7 +63,7 @@ def get_role_data_for_user(app, user_id):
                     "date_expires": None,
                     "passed": None,
                 })
-            else:
+            else:  
                 required_course_data.append({
                     "course_id": course_data[0],
                     "course_status": get_course_status(training_data),
@@ -78,7 +78,6 @@ def get_role_data_for_user(app, user_id):
                 "role_id": role_id,
                 "qualified": qualified,
                 "role_name": role_info[1],
-                "role_description": role_info[2],
                 "course_info": required_course_data,
             })
         

@@ -1,5 +1,5 @@
 <!-- templates/settings.html -->
-{% extends "base.html" %}
+{% extends "global/base.html" %}
 
 {% block title %}Settings · DansHQ{% endblock %}
 
@@ -11,7 +11,7 @@
 
         <h3>Edit user permissions</h3>
         
-        <form action='admin-settings' method='POST'>
+        <form action='settings' method='POST'>
 
             <div class="mb-3">
                 <label for="userSelect" class="form-label">User</label>

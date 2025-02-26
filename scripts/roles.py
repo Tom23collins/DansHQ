@@ -1,10 +1,23 @@
-from db import db_query
+from db import db_query, db_update
+
+def add_role(app, request):
+
+    sql = """
+    INSERT INTO roles (`role_name`)
+    VALUES (%s)
+    """
+
+    values = (
+        request.form['name'],
+    )
+
+    db_update(app, sql, values)
 
 def get_roles(app):
     role_data = []
     roles = db_query(app, 'SELECT * FROM roles')
-    courses_required = db_query(app, 'SELECT * FROM role_requirements')
-    users_required = db_query(app, 'SELECT * FROM user_roles')
+    courses_required = db_query(app, 'SELECT * FROM roles_courses')
+    users_required = db_query(app, 'SELECT * FROM users_roles')
 
     role_courses_count = {}
     for req in courses_required:
@@ -27,6 +40,5 @@ def get_roles(app):
         })
 
     return role_data
-
 
 
