@@ -103,39 +103,35 @@ def logout():
 def index():
     return redirect(url_for('training_profile', user_id=flask_login.current_user.id))
 
-@app.route('/training-profile', methods=['GET', 'POST'])
+@app.route('/personnel/<int:user_id>', methods=['GET', 'POST'])
 @flask_login.login_required
-def training_profile():
+def training_profile(user_id):
     if request.method == 'POST':
-
         update_user_details(app, request)
         update_user_roles(app, request)
-    
-        return redirect(url_for('training_profile', 
-                                user_id = request.form['user_id']
-                                ))
-    
+
+        return redirect(url_for('training_profile', user_id=user_id))
+
     if request.method == 'GET':
-        user_id = request.args.get('user_id')
         user_info = db_query_values(app, 'SELECT * FROM users WHERE id = %s', (user_id,))
         user_training = db_query_values(app, 'SELECT * FROM training_log WHERE user_id = %s', (user_id,))
         user_roles = db_query_values(app, 'SELECT role_id FROM user_roles WHERE user_id = %s', (user_id,))
         all_roles = db_query(app, 'SELECT * FROM roles')
 
         return render_template(
-            'training_profile.html',   
+            'training_profile.html',
             user=flask_login.current_user,
             user_id=user_id,
-            user_info = user_info,
-            user_roles = user_roles,
-            roles = all_roles,
+            user_info=user_info,
+            user_roles=user_roles,
+            roles=all_roles,
             user_training=user_training,
             result_data=get_role_data_for_user(app, user_id)
         )
 
     return redirect(url_for('training_profile', user_id=user_id))
 
-@app.route('/training-register', methods=['GET', 'POST'])
+@app.route('/personnel', methods=['GET', 'POST'])
 @flask_login.login_required
 @role_required('office_staff')
 def training_register():

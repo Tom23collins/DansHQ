@@ -32,6 +32,7 @@ def get_course_status(training_data):
         return True
     
     return False
+
 def get_role_data_for_user(app, user_id):
     role_data = []
     user_roles = db_query_values(app, 'SELECT role_id FROM user_roles WHERE user_id = %s', (user_id,))
