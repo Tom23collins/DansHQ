@@ -1,4 +1,7 @@
-from db import db_query, db_update
+from db import query, query_values, update
+
+from .person import get_person_roles
+from .role import get_role_courses
 
 def add_role(app, request):
 
@@ -11,13 +14,56 @@ def add_role(app, request):
         request.form['name'],
     )
 
-    db_update(app, sql, values)
+    update(app, sql, values)
+
+def get_roles_user(app, user_id):
+    roles = []
+    person_roles = get_person_roles(app, user_id)
+
+    for role in person_roles:
+        courses = get_role_courses(app, role_id)
+
+        for course in courses:
+            get_course(app, course_id)
+            course_data = query_values(app, 'SELECT * FROM courses WHERE id = %s', (course_id,))[0]
+
+            training_data = get_training_data(app, course_id, user_id)
+
+            if training_data == []:
+                qualified = False
+                required_course_data.append({
+                    "course_id": course_data[0],
+                    "course_status": False,
+                    "course_name": course_data[1],
+                    "course_desc": course_data[2],
+                    "date_attended": None,
+                    "date_expires": None,
+                    "passed": None,
+                })
+            else:  
+                required_course_data.append({
+                    "course_id": course_data[0],
+                    "course_status": get_course_status(training_data),
+                    "course_name": course_data[1],
+                    "course_desc": course_data[2],
+                    "date_attended": training_data[0][3],
+                    "date_expires": training_data[0][4],
+                })
+
+        role_data.append({
+                "role_id": role_id,
+                "qualified": qualified,
+                "role_name": role_info[1],
+                "course_info": required_course_data,
+            })
+        
+    return role_data
 
 def get_roles(app):
     role_data = []
-    roles = db_query(app, 'SELECT * FROM roles')
-    courses_required = db_query(app, 'SELECT * FROM roles_courses')
-    users_required = db_query(app, 'SELECT * FROM users_roles')
+    roles = query(app, 'SELECT * FROM roles')
+    courses_required = query(app, 'SELECT * FROM roles_courses')
+    users_required = query(app, 'SELECT * FROM users_roles')
 
     role_courses_count = {}
     for req in courses_required:

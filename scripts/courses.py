@@ -1,4 +1,4 @@
-from db import db_update
+from db import update
 
 def add_course(app, request):
     sql = """
@@ -21,4 +21,4 @@ def add_course(app, request):
         cost,
     )
 
-    db_update(app, sql, values)
+    update(app, sql, values)

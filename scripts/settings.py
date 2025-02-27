@@ -1,6 +1,6 @@
-from db import db_update
+from db import update
 
-def update_user_role(app, request):
+def set_user_access(app, request):
     sql = """
         UPDATE users
         SET user_role = %s
@@ -11,4 +11,4 @@ def update_user_role(app, request):
         request.form['user_id'],
     )
 
-    db_update(app, sql, values)
+    update(app, sql, values)

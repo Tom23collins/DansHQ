@@ -9,7 +9,7 @@ def connection_open(app):
         database=app.config.get('DB_NAME')
     )
 
-def db_update(app, sql, values):
+def update(app, sql, values):
     try:
         with connection_open(app) as connection:
             with closing(connection.cursor()) as cursor:
@@ -18,7 +18,7 @@ def db_update(app, sql, values):
     except mysql.connector.Error as err:
         print(f"Error: {err}")
 
-def db_query(app, sql):
+def query(app, sql):
     try:
         with connection_open(app) as connection:
             with closing(connection.cursor()) as cursor:
@@ -29,7 +29,7 @@ def db_query(app, sql):
         print(f"Error: {err}")
         return None
 
-def db_query_values(app, sql, values):
+def query_values(app, sql, values):
     try:
         with connection_open(app) as connection:
             with closing(connection.cursor()) as cursor:

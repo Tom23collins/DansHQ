@@ -1,4 +1,4 @@
-from db import db_update
+from db import update
 from datetime import datetime
 
 def update_user_details(app, request):
@@ -22,4 +22,4 @@ def update_user_details(app, request):
         user_id,
     )
 
-    db_update(app, sql, values)
+    update(app, sql, values)

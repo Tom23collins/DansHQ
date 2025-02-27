@@ -72,3 +72,11 @@
 
 .shadow-success {text-shadow: 0 0 10px rgba(25, 135, 84, 0.5);}
 .shadow-success:hover {text-shadow: 0 0 10px rgba(25, 135, 84, 1);}
+
+.role-btn.selected {
+    font-weight: bold;
+}
+
+.role-btn:hover {
+    text-decoration: none;
+}

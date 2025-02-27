@@ -1,20 +1,19 @@
-from db import db_query
+from db import query
 from datetime import datetime
-from .user_role_data import get_role_data_for_user, get_course_status
 from flask import Response
 
 def get_training_data(app):
     training_data = []
-    users = db_query(app, 'SELECT * FROM users')
+    users = query(app, 'SELECT * FROM users')
 
-    for user in users:
-        user_training_data = get_role_data_for_user(app, user[0])
+    # for user in users:
+    #     user_training_data = get_role_data_for_user(app, user[0])
 
-        training_data.append({
-                "user_id": user[0],
-                "user_name": user[3],
-                "training_data": user_training_data,
-            })
+    #     training_data.append({
+    #             "user_id": user[0],
+    #             "user_name": user[3],
+    #             "training_data": user_training_data,
+    #         })
         
     return training_data
 
@@ -45,7 +44,7 @@ def download_training_data(app):
 
 def get_fully_qualified(app):
     training_data = []
-    users = db_query(app, 'SELECT * FROM users')
+    users = query(app, 'SELECT * FROM users')
 
     for user in users:
         user_training_data = get_role_data_for_user(app, user[0])

@@ -1,7 +1,7 @@
 <!-- templates/settings.html -->
 {% extends "global/base.html" %}
 
-{% block title %}{{ user_info[0][3] }} · DansHQ{% endblock %}
+{% block title %}{{ person["name"] }} · DansHQ{% endblock %}
 
 {% block scripts %}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -14,42 +14,40 @@
     if (addTrainingBtn) {
         addTrainingBtn.addEventListener('click', () => {
             const addTrainingModal = document.getElementById('addTrainingModal');
-            if (addTrainingModal) {
+            if (addTrainingModal && typeof bootstrap !== 'undefined') {
                 new bootstrap.Modal(addTrainingModal).show();
             }
         });
     }
 
-    // Role filtering - Show only the first matching training card
-    const roleSelect = document.getElementById('roleSelect');
+    // Role filtering logic
+    const roleButtons = document.querySelectorAll('.role-btn');
     const roleCards = document.querySelectorAll('.role-card');
 
-    if (roleSelect && roleCards.length > 0) {
-        roleSelect.selectedIndex = 0;
-        const defaultRole = roleSelect.value;
-        let firstMatch = true;
+    if (roleButtons.length > 0 && roleCards.length > 0) {
+        // Set initial role visibility based on the first button
+        let defaultRole = roleButtons[0].getAttribute('data-role');
 
         roleCards.forEach(card => {
-            if (card.getAttribute('data-role') === defaultRole && firstMatch) {
-                card.style.display = 'block';
-                firstMatch = false;
-            } else {
-                card.style.display = 'none';
-            }
+            card.style.display = (card.getAttribute('data-role') === defaultRole) ? 'block' : 'none';
         });
 
-        // Handle dropdown change event
-        roleSelect.addEventListener('change', () => {
-            const selectedRole = roleSelect.value;
-            let firstMatch = true;
+        // Set active state on first role button
+        roleButtons[0].classList.add('active', 'selected');
 
-            roleCards.forEach(card => {
-                if (card.getAttribute('data-role') === selectedRole && firstMatch) {
-                    card.style.display = 'block';
-                    firstMatch = false;
-                } else {
-                    card.style.display = 'none';
-                }
+        // Handle role button clicks
+        roleButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const selectedRole = button.getAttribute('data-role');
+
+                // Show only the matching role cards
+                roleCards.forEach(card => {
+                    card.style.display = (card.getAttribute('data-role') === selectedRole) ? 'block' : 'none';
+                });
+
+                // Update active button state and apply underline effect
+                roleButtons.forEach(btn => btn.classList.remove('active', 'selected'));
+                button.classList.add('active', 'selected');
             });
         });
     }
@@ -59,8 +57,8 @@
     document.body.style.overflowX = 'hidden';
 });
 
-</script>
 
+</script>
 {% endblock %}
 
 {% block content %}
@@ -68,19 +66,15 @@
 
    <div class="col-3 px-3">
         <div class="row bg-white p-3 rounded border text-center mb-4">
-            {% if user_info %}
-                {% for row in user_info %}
-                    <i class="bi bi-person-circle" style="font-size: 80px;"></i>
-                    <h5>{{ user_info[0][3] }}</h5>
-                    {% for row in roles %}
-                        {% if row[0] in user_roles | map(attribute=0) %}
-                            <p class="m-0">
-                                <p class="rounded-pill bg-secondary text-light w-auto m-auto mb-0">
-                                    {{ row[1] }}
-                                </p>
-                            </p>
-                        {% endif %}
-                    {% endfor %}
+            {% if person %}
+                <i class="bi bi-person-circle" style="font-size: 80px;"></i>
+                <h5>{{ person["name"] }}</h5>
+                {% for role in person["roles"] %}
+                    <p class="m-0">
+                        <p class="rounded-pill bg-secondary text-light w-auto m-auto mb-0">
+                            {{ role["name"] }}
+                        </p>
+                    </p>
                 {% endfor %}
             {% else %}
                 <tr>
@@ -91,15 +85,13 @@
 
         <div class="row bg-white p-3 rounded border mb-4">
             <h5>Personnel details</h5>
-            {% if user_info %}
-                {% for row in user_info %}
-                    <h6>Email</h6>
-                    <p>{{ row[1] }}</p>
-                    <h6>Phone</h6>
-                    <p>{{ row[4] }}</p>
-                    <h6>Date start</h6>
-                    <p class="mb-0">{{ row[5] }}</p>
-                {% endfor %}
+            {% if person %}
+                <h6>Email</h6>
+                <p>{{ person["email"] }}</p>
+                <h6>Phone</h6>
+                <p>{{ person["phone"] }}</p>
+                <h6>Date start</h6>
+                <p class="mb-0">{{ person["date_start"] }}</p>
             {% else %}
                 <p>No user data available</p>
             {% endif %}
@@ -108,61 +100,46 @@
 
    <div class="col-9 px-3">
         <div class="row bg-white p-3 rounded border mb-4">
-            <select id="roleSelect" class="form-select w-100">
-                {% for role in result_data %}
-                    <option value="{{ role['role_name'] }}">
-                        {{ role['role_name'] }}
-                    </option>
-                {% endfor %}
-            </select>
+            {% for role in person["roles"] %}
+                <button class="btn nav-link w-auto me-2 role-btn" data-role="{{ role['name'] }}">
+                    <i class="bi bi-circle-fill text-danger"></i>
+                    {{ role['name'] }}
+                </button>
+            {% endfor %}
         </div>
 
         <div id="rolesContainer">
-            {% for role in result_data %}
-                <div class="row bg-white p-3 rounded border mb-4 role-card" data-role="{{ role['role_name'] }}">
-        
-                    <h5> {{ role['role_name'] }}</h5>
+            {% for role in person["roles"] %}
+            <div class="row bg-white p-3 rounded border mb-4 role-card" data-role="{{ role['name'] }}">
+                <h5> {{ role["name"] }}</h5>
                     
-                    {% if role['course_info'] %}
-                    <table class="table">
+                {% if role["courses"] %}
+                <table class="table table-hover table-sm table-responsive">
+    
+                    <thead>
+                        <tr>
+                        <th scope="col">Status</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Date expires</th>
+                        </tr>
+                    </thead>
         
-                        <thead>
-                          <tr>
-                            <th scope="col"></th>
-                            <th scope="col">Name</th>
-                            <th scope="col">Description</th>
-                            <th scope="col">Date attended</th>
-                            <th scope="col">Date expires</th>
-                            <th scope="col">Passed</th>
-                          </tr>
-                        </thead>
-            
-                        <tbody>
-                            {% for course in role['course_info'] %}
-                                <tr>
-                                    <td>
-                                        <i class="bi bi-circle-fill {% if course['course_status'] == True %}
-                                                text-success
-                                            {% elif course['course_status'] == 'Expiring Soon' %}
-                                                text-warning
-                                            {% else %}
-                                                text-danger
-                                            {% endif %}
-                                        "></i>
-                                    </td>
-                                    <td>{{ course['course_name'] }}</td>
-                                    <td>{{ course['course_desc'] }}</td>
-                                    <td>{{ course['date_attended'] }}</td>
-                                    <td>{{ course['date_expires'] }}</td>
-                                    <td>{{ 'True' if course['passed'] else 'False' }}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                        
-                    </table>
-                    {% else %}
-                        <p>No required courses for this role, add some!</p>
-                    {% endif %}
+                    <tbody>
+                        {% for course in role["courses"] %}
+                            <tr>
+                                <td>
+                                    <i class="bi bi-circle-fill text-{{ course['status'] }} shadow-{{ course['status'] }}"></i>
+                                </td>
+                                <td>{{ course['name'] }}</td>
+                                <td>{{ course['date_expires'] }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                    
+                </table>
+                {% else %}
+                    <p>No required courses for this role, add some!</p>
+                {% endif %}
         
                 </div>
             {% endfor %}
