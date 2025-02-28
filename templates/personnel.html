@@ -97,6 +97,7 @@
         </div>
         <div class="modal-body">
             <form action='personnel' method='POST' autocomplete="new-password">
+                <input type="hidden" name="action" value="set_personnel">
                 <div class="mb-3 text-start">
                     <label for="name" class="form-label">Name*</label>
                     <input type="text" class="form-control" id="name" name='name' required>

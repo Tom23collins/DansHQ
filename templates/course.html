@@ -1,0 +1,105 @@
+<!-- templates/settings.html -->
+{% extends "global/base.html" %}
+
+{% block title %}Course name · DansHQ{% endblock %}
+
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+    // Disable horizontal scrollbar
+    document.documentElement.style.overflowX = 'hidden';
+    document.body.style.overflowX = 'hidden';
+});
+
+
+</script>
+{% endblock %}
+
+{% block content %}
+
+<div class="d-flex gap-3 mt-5">
+    <div class="col-3 px-3">
+        <div class="row bg-white p-3 rounded border text-center mb-4">
+            {% if course %}
+                <i class="bi bi-backpack" style="font-size: 80px;"></i>
+                <h5>{{ course["name"] }}</h5>
+                {% if course %}
+                    {% for role in course['roles']%}
+                        <p class="m-0">
+                            <p class="rounded-pill bg-secondary text-light w-auto m-auto mb-0">
+                                {{ role["name"] }}
+                            </p>
+                        </p>
+                    {% endfor %}
+                {% endif %}
+            {% else %}
+                <tr>
+                    <td colspan="6">No course data available</td>
+                </tr>
+            {% endif %}
+        </div>
+
+        <div class="row bg-white p-3 rounded border mb-4">
+            <h5>Course details</h5>
+            {% if course %}
+                {% if course['expires'] == 1%}
+                    <h6>Renewal</h6>
+                    <p>{{ course["renewal"] }}</p>
+                {% endif %}
+                <h6>Method</h6>
+                <p>{{ course["method"] }}</p>
+                <h6>Provider</h6>
+                <p>{{ course["provider"] }}</p>
+                <h6>Cost</h6>
+                <p>£{{ course["cost"] }}</p>
+                {% if user.user_role != 'user' %}
+                <button id="editCourseBtn" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUserModal">
+                    Edit details
+                </button>
+                {% endif %}
+            {% else %}
+                <p>No user data available</p>
+            {% endif %}
+        </div>
+    </div>
+
+   <div class="col-9 px-3">
+        <div class="row bg-white p-3 rounded border mb-4">
+            <h5>Personnel</h5>
+            {% if course["personnel"] %}
+                <table class="table table-hover table-sm table-responsive">
+    
+                    <thead>
+                        <tr>
+                            <th scope="col">Status</th>
+                            <th scope="col">Name</th>
+                            <th>Date attended</th>
+                            <th scope="col">Date expires</th>
+                        </tr>
+                    </thead>
+        
+                    <tbody>
+                        {% for person in course["personnel"] %}
+                            <tr>
+                                <td>
+                                    <i class="bi bi-circle-fill text-{{ person['status'] }} shadow-{{ person['status'] }}"></i>
+                                </td>
+                                <td>{{ person['name'] }}</td>
+                                <td>{{ person['date_attended'] }}</td>
+                                <td>{{ person['date_expires'] }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                    
+                </table>
+                {% else %}
+                    <p>No personnel on this course.</p>
+                {% endif %}
+        </div> 
+   </div>
+
+</div>
+{% endblock %}

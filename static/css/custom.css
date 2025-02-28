@@ -46,6 +46,10 @@
     --bs-btn-disabled-border-color: #082C65;
 }
 
+h5 {
+    padding: 0px !important;
+}
+
 :root {
     --bs-primary: #082C65;
     --bs-primary-rgb: 8, 44, 101;

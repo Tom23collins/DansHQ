@@ -64,7 +64,7 @@
                 {% if courses %}
                     {% for course in courses %}
                     <tr onclick="window.location.href='{{ url_for('course', course_id=course['id']) }}';" style="cursor: pointer;">
-                        <td><i class="bi bi-circle-fill text-danger shadow-danger"></i></td>
+                        <td><i class="bi bi-circle-fill text-{{ course['status'] }} shadow-{{ course['status'] }}"></i></td>
                         <td>{{ course['name'] }}</td>
                         <td>{{ course['method'] }}</td>
                         <td>{{ course['provider'] }}</td>

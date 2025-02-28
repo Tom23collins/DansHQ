@@ -1,8 +1,17 @@
 from db import update, query
 
+from .course import get_course
+
 def get_courses(app):
-    result = []
     courses = query(app, 'SELECT * FROM courses')
+
+    result = []
+
+    for course in courses:
+        data = get_course(app, course[0])
+        result.append(data)
+
+    return result
 
     for row in courses:
         result.append({

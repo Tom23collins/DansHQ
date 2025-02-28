@@ -116,7 +116,7 @@
         <div id="rolesContainer">
             {% for role in person["roles"] %}
             <div class="row bg-white p-3 rounded border mb-4 role-card" data-role="{{ role['name'] }}">
-                <h5> {{ role["name"] }}</h5>
+                <h5>{{ role["name"] }}</h5>
                     
                 {% if role["courses"] %}
                 <table class="table table-hover table-sm table-responsive">
@@ -171,7 +171,6 @@
         <div class="modal-body">
             <form action="{{ url_for('person', user_id=person['id']) }}" method="POST">
                 <input type="hidden" name="action" value="update_user">
-
                 <input type="hidden" name="user_id" value="{{ person['id'] }}">
 
                 <div class="mb-3 text-start">

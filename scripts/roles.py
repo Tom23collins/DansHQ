@@ -15,7 +15,7 @@ def get_roles(app):
     role_data = []
     for role_id, role_name in roles:
         role_data.append({
-            "status": "active" if role_id in role_users_count else "inactive",
+            "status": "active",
             "id": role_id,
             "name": role_name.strip(),
             "courses": role_courses_count.get(role_id, 0),

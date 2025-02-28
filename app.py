@@ -103,17 +103,13 @@ def index():
 @app.route('/courses/<int:course_id>', methods=['GET', 'POST'])
 @flask_login.login_required
 def course(course_id):
-    if request.method == 'POST':
-        update_user_details(app, request)
-        update_user_roles(app, request)
-
-        return redirect(url_for('course', course_id=course_id))
 
     if request.method == 'GET':
 
         return render_template(
             'course.html',
             user=flask_login.current_user,
+            course = get_course(app, course_id)
         )
 
     return redirect(url_for('course', course_id=course_id))
@@ -163,12 +159,16 @@ def personnel():
                                 personnel = get_personnel(app)
                                 )
     
-    if request.method == 'POST' and 'download' in request.form:
-        pass
-        # return download_training_data(app)
-    
-    set_personnel(app, request)
-    return redirect(url_for('personnel'))
+    if request.method == 'POST':
+        action = request.form.get('action')
+
+        if action == 'download':
+            pass
+
+        elif action == 'set_personnel':
+            set_personnel(app, request)
+
+        return redirect(url_for('personnel'))
 
 @app.route('/roles/<int:role_id>', methods=['GET', 'POST'])
 @flask_login.login_required
@@ -176,66 +176,15 @@ def personnel():
 def role(role_id):
 
     if request.method == 'GET':
-        role_info = query_values(app, 'SELECT * FROM roles WHERE role_id = %s', (role_id,))
-        courses = query(app, 'SELECT * FROM courses')
-        role_requirements = query_values(app, 'SELECT * FROM roles_courses WHERE role_id = %s', (role_id,))
-
         return render_template(
             'role.html',
             user=flask_login.current_user,
-            role_id=role_id,
-            role_info=role_info,
-            courses=courses,
-            role_requirements=role_requirements
+            role=get_role(app, role_id)
         )
 
     if request.method == 'POST':
-
-        role_id = request.form['role_id']
-
-        sql = """
-        UPDATE roles
-        SET role_name = %s
-        WHERE role_id = %s
-        """
-
-        values = (
-            request.form.get('name'),
-            request.form['role_id'],
-        )
-
-        update(app, sql, values)
-
-        training_courses_ids = query(app, sql = "SELECT id FROM courses")
-
-        sql = """
-        DELETE FROM roles_courses
-        WHERE role_id = %s
-        """
-
-        values = [role_id]
-
-        update(app, sql, values)
-
-        for training_course in training_courses_ids:
-            training_course_id = training_course[0]
-            training_course_mandatory = request.form.get(f'is_mandatory_{training_course_id}')
-            
-            if training_course_mandatory != None:
-                sql = """
-                INSERT INTO roles_courses (`role_id`, `course_id`)
-                VALUES (%s, %s)
-                """
-                values = (
-                    role_id,
-                    training_course_id,
-                )
-
-                update(app, sql, values)
-
+        set_role(app, request)
         return redirect(url_for('role', role_id = request.form['role_id']))
-
-    return redirect(url_for('role'))
 
 @app.route('/roles', methods=['GET', 'POST'])
 @flask_login.login_required
