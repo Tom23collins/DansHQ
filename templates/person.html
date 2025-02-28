@@ -91,7 +91,12 @@
                 <h6>Phone</h6>
                 <p>{{ person["phone"] }}</p>
                 <h6>Date start</h6>
-                <p class="mb-0">{{ person["date_start"] }}</p>
+                <p>{{ person["date_start"] }}</p>
+                {% if user.user_role != 'user' %}
+                <button id="editUserBtn" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUserModal">
+                    Edit details
+                </button>
+                {% endif %}
             {% else %}
                 <p>No user data available</p>
             {% endif %}
@@ -102,7 +107,7 @@
         <div class="row bg-white p-3 rounded border mb-4">
             {% for role in person["roles"] %}
                 <button class="btn nav-link w-auto me-2 role-btn" data-role="{{ role['name'] }}">
-                    <i class="bi bi-circle-fill text-danger"></i>
+                    <i class="bi bi-circle-fill text-{{ role['status']}} shadow-{{ role['status']}}"></i>
                     {{ role['name'] }}
                 </button>
             {% endfor %}
@@ -138,7 +143,7 @@
                     
                 </table>
                 {% else %}
-                    <p>No required courses for this role, add some!</p>
+                    <p>No required courses for this role.</p>
                 {% endif %}
         
                 </div>
@@ -153,68 +158,51 @@
 
         </div>
 
-   </div>
-
-<!-- MODAL: Add New Training -->
-<div class="modal fade" id="addTrainingModal" tabindex="-1" aria-labelledby="addTrainingModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addTrainingModalLabel">Add New Training</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-
-            <div class="modal-body">
-                <form action='training-register' method='POST'>
-                    <div class="mb-3">
-                        <label for="user_id" class="form-label">User</label>
-                        <select id="user_id" name="user_id" class="form-control" required>
-                            <option value="" disabled selected>Select a trainee</option>
-                            {% if users %}
-                                {% for row in users %}
-                                    <option value="{{ row[0] }}">{{ row[3] }}</option>
-                                {% endfor %}
-                            {% else %}
-                                <option value="">No course provider data available</option>
-                            {% endif %}
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="training_id" class="form-label">Training course</label>
-                        <select id="training_id" name="training_id" class="form-control" required>
-                            <option value="" disabled selected>Select a training course</option>
-                            {% if training_courses %}
-                                {% for row in training_courses %}
-                                    <option value="{{ row[0] }}">{{ row[1] }}</option>
-                                {% endfor %}
-                            {% else %}
-                                <option value="">No course data available</option>
-                            {% endif %}
-                        </select>
-                    </div>
-
-                    <div class="mb-3 text-start">
-                        <label for="date_attended" class="form-label">Date attended</label>
-                        <input type="date" class="form-control" id="date_attended" name="date_attended" required>
-                    </div>
-
-                    <div class="mb-3 text-start">
-                        <label for="date_expires" class="form-label">Date expires</label>
-                        <input type="date" class="form-control" id="date_expires" name="date_expires" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <input type="checkbox" class="form-check-input" id="passed" name="passed">
-                        <label class="form-check-label" for="passed">Course passed</label>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary w-100 mb-3">Submit</button>
-                </form>
-            </div>
-        </div>
     </div>
 </div>
 
+<div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="createUserModalLabel">Edit details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+            <form action="{{ url_for('person', user_id=person['id']) }}" method="POST">
+                <input type="hidden" name="action" value="update_user">
+
+                <input type="hidden" name="user_id" value="{{ person['id'] }}">
+
+                <div class="mb-3 text-start">
+                    <label for="name" class="form-label">Name*</label>
+                    <input type="text" class="form-control" id="name" name='name' value="{{ person['name'] }}" required>
+                </div>
+
+                <div class="mb-3 text-start">
+                    <label for="exampleInputEmail1" class="form-label">Email*</label>
+                    <input type="email" class="form-control" id="exampleInputEmail1" name='email' value="{{ person['email'] }}" required>
+                </div>
+
+                <div class="mb-3 text-start">
+                    <label for="phone" class="form-label">Phone*</label>
+                    <input type="tel" class="form-control" id="phone" name="phone" value="{{ person['phone'] }}" required>
+                </div>
+
+                <div class="mb-3 text-start">
+                    <label for="date_start" class="form-label">Date Start*</label>
+                    <input type="date" class="form-control" id="date_start" name="date_start" value="{{ person['date_start'] }}" required> 
+                </div>
+
+                <div class="mb-3 text-start">
+                    <label for="date_leave" class="form-label">Date Leave</label>
+                    <input type="date" class="form-control" id="date_leave" name="date_leave" value="{{ person['date_leave'] }}">
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 mb-3">Submit</button>
+            </form>
+        </div>
+      </div>
+    </div>
 </div>
 {% endblock %}

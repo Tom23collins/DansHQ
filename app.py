@@ -3,7 +3,7 @@ import flask_login
 import config
 import os
 from db import query, query_values, update
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash
 from functools import wraps
 from scripts import *
 from datetime import datetime
@@ -124,35 +124,25 @@ def course(course_id):
 def courses():
 
     if request.method == 'GET':
-        data = []
-        courses = query(app, 'SELECT * FROM courses')
-
-        for row in courses:
-            data.append({
-                    "id": row[0],
-                    "name": row[1],
-                    "expires": row[2],
-                    "renewal": row[3],
-                    "method": row[4],
-                    "provider": row[5],
-                    "cost": row[6],
-                })
             
         return render_template('courses.html', 
                                user=flask_login.current_user, 
-                               course_register = data)
+                               courses = get_courses(app))
 
-    add_course(app, request)
+    set_course(app, request)
     return redirect(url_for('courses'))
 
 @app.route('/personnel/<int:user_id>', methods=['GET', 'POST'])
 @flask_login.login_required
 def person(user_id):
-    # if request.method == 'POST':
-    #     update_user_details(app, request)
-    #     update_user_roles(app, request)
+    if request.method == 'POST':
+        action = request.form.get('action')
 
-    #     return redirect(url_for('person', user_id=user_id))
+        if action == 'update_user':
+            set_person(app, request)
+
+        return redirect(url_for('person', 
+                        user_id=user_id))
 
     if request.method == 'GET':
         print(get_person(app, user_id))
@@ -163,41 +153,21 @@ def person(user_id):
             person=get_person(app, user_id)
         )
 
-    return redirect(url_for('person', user_id=user_id))
-
 @app.route('/personnel', methods=['GET', 'POST'])
 @flask_login.login_required
 @role_required('office_staff')
 def personnel():
     if request.method == 'GET':
-
-        training_data = get_fully_qualified(app)
-
         return render_template('personnel.html', 
                                 user=flask_login.current_user,
-                                training_data = training_data,
-                                users = query(app, 'SELECT * FROM users'),
-                                training_courses = query(app, 'SELECT * FROM courses'))
+                                personnel = get_personnel(app)
+                                )
     
     if request.method == 'POST' and 'download' in request.form:
-        return download_training_data(app)
+        pass
+        # return download_training_data(app)
     
-    passed = 1 if request.form['passed'] == 'on' else 0
-    
-    sql = """
-    INSERT INTO training (`user_id`, `training_id`, `date_attended`, `date_expires`, `passed`)
-    VALUES (%s, %s, %s, %s, %s)
-    """
-    values = (
-        request.form['user_id'],
-        request.form['training_id'],
-        request.form['date_attended'],
-        request.form['date_expires'],
-        passed,
-    )
-
-    update(app, sql, values)
-
+    set_personnel(app, request)
     return redirect(url_for('personnel'))
 
 @app.route('/roles/<int:role_id>', methods=['GET', 'POST'])
@@ -278,7 +248,7 @@ def roles():
                                roles = get_roles(app))
     
 
-    add_role(app, request)
+    set_role(app, request)
 
     return redirect(url_for('roles'))
 
@@ -291,7 +261,7 @@ def settings():
     if request.method == 'GET':
         return render_template('settings.html', user=flask_login.current_user, users=users)
     
-    update_user_role(app, request)
+    set_user_access(app, request)
     return redirect(url_for('settings'))
 
 if __name__ == "__main__":
