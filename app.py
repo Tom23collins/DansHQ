@@ -141,8 +141,6 @@ def person(user_id):
                         user_id=user_id))
 
     if request.method == 'GET':
-        print(get_person(app, user_id))
-
         return render_template(
             'person.html',
             user=flask_login.current_user,

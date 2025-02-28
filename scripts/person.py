@@ -50,10 +50,12 @@ def get_person(app, user_id):
         "date_start": user_data[4],
         "date_leave": user_data[5],
         "status": "danger",
+        "actions": 0,  # Count missing trainings
         "roles": {}
     }
 
     # Build role->courses structure
+    missing_trainings = 0
     for row in data:
         role_id = row[6]
         if role_id:
@@ -75,18 +77,24 @@ def get_person(app, user_id):
                 "date_expires": row[12],
             })
 
-    for role_id, role_info in result["roles"].items():
+            if course_status == "danger":
+                missing_trainings += 1
+
+    result["actions"] = missing_trainings
+
+    # Determine role status
+    for role_info in result["roles"].values():
         course_statuses = [course["status"] for course in role_info["courses"]]
         role_info["status"] = worst_status(course_statuses)
     
+    # Determine overall user status
     all_role_statuses = [role_info["status"] for role_info in result["roles"].values()]
-    user_status = worst_status(all_role_statuses)
-    result["status"] = user_status
+    result["status"] = worst_status(all_role_statuses)
 
+    # Convert roles to list
     result["roles"] = list(result["roles"].values())
     
     return result
-
 
 def set_person(app, request):
     date_start = (datetime.strptime(request.form.get('date_start'), '%Y-%m-%d').strftime('%Y-%m-%d') if request.form.get('date_start') else None)
